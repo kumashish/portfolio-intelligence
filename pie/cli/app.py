@@ -9,6 +9,7 @@ from rich.table import Table
 
 from pie.config.loader import load_config
 from pie.config.models import TrendWeights
+from pie.market.backtest.engine import TrendBacktester
 from pie.market.indicators.engine import IndicatorEngine
 from pie.market.trend.engine import TrendEngine
 from pie.market_data.exceptions import MarketDataError
@@ -61,6 +62,47 @@ def analyze_market(
     console.print(f"Trend Score: {trend.trend_score.value:.1f}")
     console.print(f"Confidence: {trend.confidence.value:.0%}")
     console.print(trend.explanation)
+
+
+@app.command("backtest-market")
+def backtest_market(
+    symbol: str,
+    config: Annotated[
+        Path | None, typer.Option(help="Optional YAML indicator and trend configuration.")
+    ] = None,
+) -> None:
+    """Backtest directional trend signals against historical index returns."""
+    try:
+        data = YahooFinanceProvider(UrllibHTTPClient()).fetch_history(
+            symbol,
+            period="5y",
+            interval="1d",
+        )
+    except MarketDataError as error:
+        console.print(f"Unable to backtest {symbol}: {error}", style="red")
+        raise typer.Exit(code=1) from error
+    application_config = load_config(config) if config is not None else None
+    configurations = application_config.indicators if application_config is not None else []
+    indicator_engine = (
+        IndicatorEngine.from_config(configurations) if configurations else IndicatorEngine.default()
+    )
+    weights = (
+        application_config.trend.weights.as_mapping()
+        if application_config is not None
+        else TrendWeights().as_mapping()
+    )
+    report = TrendBacktester(indicator_engine, TrendEngine.from_weights(weights)).run(symbol, data)
+    table = Table(title=f"Trend Signal Backtest: {symbol}")
+    table.add_column("Metric")
+    table.add_column("Value", justify="right")
+    table.add_row("Closed signals", str(len(report.trades)))
+    table.add_row("Win rate", f"{report.win_rate:.1%}")
+    table.add_row("Average move", f"{report.average_return_percent:.2f}%")
+    table.add_row("Cumulative return", f"{report.cumulative_return_percent:.2f}%")
+    table.add_row("Maximum drawdown", f"{report.maximum_drawdown_percent:.2f}%")
+    console.print(table)
+    for assumption in report.assumptions:
+        console.print(f"- {assumption}")
 
 
 @app.command()
