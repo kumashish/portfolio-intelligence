@@ -25,3 +25,12 @@ def test_load_config_rejects_unknown_values(tmp_path: Path) -> None:
 
     with pytest.raises(ValidationError):
         load_config(config_path)
+
+
+def test_load_config_accepts_indicator_configuration(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text("indicators:\n  - ema:\n      period: 20\n", encoding="utf-8")
+
+    config = load_config(config_path)
+
+    assert config.indicators == [{"ema": {"period": 20}}]

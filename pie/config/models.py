@@ -30,3 +30,4 @@ class AppConfig(ConfigModel):
 
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
     providers: dict[str, ProviderConfig] = Field(default_factory=dict)
+    indicators: list[dict[str, dict[str, Any]]] = Field(default_factory=list)

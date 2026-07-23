@@ -1,7 +1,12 @@
 """Yahoo Finance implementation of the market-data provider contract."""
 
+import json
 from collections.abc import Mapping
+from dataclasses import dataclass
 from typing import Any, Protocol
+from urllib.error import HTTPError
+from urllib.parse import urlencode
+from urllib.request import urlopen
 
 import polars as pl
 import structlog
@@ -30,6 +35,36 @@ class HTTPClient(Protocol):
 
     def get(self, url: str, *, params: Mapping[str, str]) -> HTTPResponse:
         """Issue an HTTP GET request."""
+
+
+@dataclass(frozen=True, slots=True)
+class JSONResponse:
+    """In-memory HTTP response suitable for the provider response contract."""
+
+    status_code: int
+    payload: object
+
+    def json(self) -> object:
+        """Return the decoded JSON payload."""
+        return self.payload
+
+
+@dataclass(frozen=True, slots=True)
+class UrllibHTTPClient:
+    """Standard-library HTTP client used by the CLI composition root."""
+
+    timeout_seconds: float = 10.0
+
+    def get(self, url: str, *, params: Mapping[str, str]) -> HTTPResponse:
+        """Issue a GET request and decode its JSON response."""
+        request_url = f"{url}?{urlencode(params)}"
+        try:
+            with urlopen(request_url, timeout=self.timeout_seconds) as response:
+                return JSONResponse(
+                    status_code=response.status, payload=json.loads(response.read())
+                )
+        except HTTPError as error:
+            return JSONResponse(status_code=error.code, payload={})
 
 
 class YahooFinanceProvider(MarketDataProvider):

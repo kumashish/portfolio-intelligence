@@ -2,7 +2,7 @@
 
 from pie.providers.interfaces import MarketDataProvider, PortfolioProvider, Provider, TrendProvider
 from pie.providers.registry import discover_providers
-from pie.providers.yahoo import HTTPClient, HTTPResponse, YahooFinanceProvider
+from pie.providers.yahoo import HTTPClient, HTTPResponse, UrllibHTTPClient, YahooFinanceProvider
 
 __all__ = [
     "HTTPClient",
@@ -11,6 +11,7 @@ __all__ = [
     "PortfolioProvider",
     "Provider",
     "TrendProvider",
+    "UrllibHTTPClient",
     "YahooFinanceProvider",
     "discover_providers",
 ]
