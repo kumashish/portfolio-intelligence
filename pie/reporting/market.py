@@ -84,6 +84,7 @@ def _trade_lines(estimated_trade: EstimatedTrade | None) -> list[str]:
         f"Expiry       : {estimated_trade.expiration.isoformat()}",
         f"Expected Move: {estimated_trade.expected_move:,.2f}",
         f"VIX          : {estimated_trade.annualized_vix:.2f}",
+        f"VIX Source   : {estimated_trade.vix_source}",
         *leg_lines,
         "",
         "Exit Strategy:",

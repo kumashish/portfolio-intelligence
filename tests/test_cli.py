@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 
 import polars as pl
@@ -6,6 +7,7 @@ import pytest
 from typer.testing import CliRunner
 
 from pie.cli import app as cli_app
+from pie.market.strategy import StrategyRecommendation, StrategyType
 from pie.providers.yahoo import YahooFinanceProvider
 
 runner = CliRunner()
@@ -36,3 +38,25 @@ def test_analyze_market_command_renders_indicators(
     assert "Market Snapshot: SPY" in result.output
     assert "EMA200" in result.output
     assert len(list(tmp_path.glob("SPY_*.txt"))) == 1
+
+
+def test_estimate_trade_uses_fallback_vix_when_provider_is_unavailable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unavailable(*_args: object, **_kwargs: object) -> None:
+        raise ValueError("VIX unavailable")
+
+    monkeypatch.setattr(YahooFinanceProvider, "fetch_history", unavailable)
+
+    trade = cli_app._estimate_trade(
+        "SPY",
+        Decimal("700"),
+        StrategyRecommendation(
+            strategy=StrategyType.CALL_DEBIT_SPREAD,
+            actionable=True,
+            rationale="Test recommendation",
+        ),
+    )
+
+    assert trade is not None
+    assert trade.vix_source == "fallback assumption"

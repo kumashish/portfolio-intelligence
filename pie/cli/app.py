@@ -24,6 +24,9 @@ from pie.reporting.market import write_market_report
 app = typer.Typer(help="Portfolio Intelligence Engine.", no_args_is_help=True)
 console = Console()
 
+VIX_SYMBOLS = {"^NSEI": "^INDIAVIX", "SPY": "^VIX", "QQQ": "^VIX"}
+FALLBACK_VIX = {"^NSEI": 15.0, "SPY": 20.0, "QQQ": 20.0}
+
 
 @app.command("analyze-market")
 def analyze_market(
@@ -162,14 +165,16 @@ def _estimate_trade(
 ) -> EstimatedTrade | None:
     if not recommendation.actionable:
         return None
-    vix_symbol = "^INDIAVIX" if symbol == "^NSEI" else "^VIX"
+    vix_symbol = VIX_SYMBOLS.get(symbol, "^VIX")
     try:
         vix_data = YahooFinanceProvider(UrllibHTTPClient()).fetch_history(
             vix_symbol,
             period="5d",
             interval="1d",
         )
-    except MarketDataError:
-        return None
-    vix = float(vix_data.get_column("close").tail(1).item())
-    return estimate_trade(symbol, float(spot_price), vix, recommendation)
+        vix = float(vix_data.get_column("close").tail(1).item())
+        vix_source = f"live {vix_symbol}"
+    except (IndexError, MarketDataError, TypeError, ValueError):
+        vix = FALLBACK_VIX.get(symbol, 20.0)
+        vix_source = "fallback assumption"
+    return estimate_trade(symbol, float(spot_price), vix, recommendation, vix_source)

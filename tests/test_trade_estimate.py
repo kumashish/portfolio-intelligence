@@ -16,6 +16,7 @@ def test_call_debit_spread_uses_spot_vix_and_monthly_expiry() -> None:
         24000.0,
         15.0,
         recommendation(StrategyType.CALL_DEBIT_SPREAD),
+        "live ^INDIAVIX",
         as_of=date(2026, 7, 24),
     )
 
@@ -24,6 +25,7 @@ def test_call_debit_spread_uses_spot_vix_and_monthly_expiry() -> None:
     assert trade.legs[0].right is OptionRight.CALL
     assert trade.legs[0].strike == 24000.0
     assert trade.legs[1].strike > trade.legs[0].strike
+    assert trade.vix_source == "live ^INDIAVIX"
     assert any("EMA50" in rule for rule in trade.exit_strategy)
 
 
@@ -33,6 +35,7 @@ def test_put_debit_spread_places_short_leg_below_long_leg() -> None:
         24000.0,
         15.0,
         recommendation(StrategyType.PUT_DEBIT_SPREAD),
+        "fallback assumption",
         as_of=date(2026, 7, 24),
     )
 
@@ -47,6 +50,7 @@ def test_no_trade_strategy_does_not_create_estimate() -> None:
         24000.0,
         15.0,
         recommendation(StrategyType.NO_TRADE),
+        "live ^INDIAVIX",
         as_of=date(2026, 7, 24),
     )
 

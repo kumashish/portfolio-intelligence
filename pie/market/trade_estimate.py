@@ -37,6 +37,7 @@ class EstimatedTrade(DomainModel):
     expiration: date
     spot_price: float = Field(gt=0.0)
     annualized_vix: float = Field(gt=0.0)
+    vix_source: str
     expected_move: float = Field(gt=0.0)
     legs: tuple[TradeLeg, ...]
     exit_strategy: tuple[str, ...]
@@ -48,6 +49,7 @@ def estimate_trade(
     spot_price: float,
     annualized_vix: float,
     recommendation: StrategyRecommendation,
+    vix_source: str,
     as_of: date | None = None,
 ) -> EstimatedTrade | None:
     """Estimate a debit spread from live spot/VIX inputs, without option pricing."""
@@ -88,6 +90,7 @@ def estimate_trade(
         expiration=expiration,
         spot_price=spot_price,
         annualized_vix=annualized_vix,
+        vix_source=vix_source,
         expected_move=round(expected_move, 2),
         legs=legs,
         exit_strategy=exit_strategy,
