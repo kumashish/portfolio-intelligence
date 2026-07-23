@@ -1,5 +1,9 @@
 name: Analyze Market
 
+concurrency:
+  group: us-market-analysis
+  cancel-in-progress: false
+  
 on:
   schedule:
     # GitHub Actions schedules use UTC. These correspond to 10:30, 13:30, and 15:20 IST.
