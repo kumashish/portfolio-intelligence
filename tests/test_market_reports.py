@@ -1,15 +1,15 @@
-import json
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 
 from pie.core.models import MarketSnapshot
 from pie.market.indicators.base import IndicatorResult
+from pie.market.strategy import StrategyRecommendation, StrategyType
 from pie.market.trend.models import ConfidenceScore, MarketRegime, TrendAnalysis, TrendScore
 from pie.reporting.market import write_market_report
 
 
-def test_write_market_report_creates_timestamped_json(tmp_path: Path) -> None:
+def test_write_market_report_creates_timestamped_dashboard(tmp_path: Path) -> None:
     snapshot = MarketSnapshot(
         symbol="^NSEI",
         observed_at=datetime(2026, 1, 1),
@@ -31,10 +31,16 @@ def test_write_market_report_creates_timestamped_json(tmp_path: Path) -> None:
         snapshot,
         {"EMA20": IndicatorResult("EMA20", 23900.0, True, True)},
         trend,
+        StrategyRecommendation(
+            strategy=StrategyType.CALL_DEBIT_SPREAD,
+            actionable=True,
+            rationale="Test recommendation",
+        ),
     )
 
-    payload = json.loads(report_path.read_text(encoding="utf-8"))
+    dashboard = report_path.read_text(encoding="utf-8")
 
     assert report_path.name.startswith("NSEI_")
-    assert payload["snapshot"]["symbol"] == "^NSEI"
-    assert payload["trend"]["regime"] == "bull"
+    assert report_path.suffix == ".txt"
+    assert "PORTFOLIO INTELLIGENCE ENGINE" in dashboard
+    assert "Strategy     : Call Debit Spread" in dashboard

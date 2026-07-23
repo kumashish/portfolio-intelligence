@@ -11,6 +11,7 @@ from pie.config.loader import load_config
 from pie.config.models import TrendWeights
 from pie.market.backtest.engine import TrendBacktester
 from pie.market.indicators.engine import IndicatorEngine
+from pie.market.strategy import select_strategy
 from pie.market.trend.engine import TrendEngine
 from pie.market_data.csv_loader import load_ohlcv_csv
 from pie.market_data.exceptions import MarketDataError
@@ -55,7 +56,8 @@ def analyze_market(
         if application_config is not None
         else TrendWeights().as_mapping()
     ).analyze(snapshot, results, data)
-    report_path = write_market_report(output_dir, snapshot, results, trend)
+    recommendation = select_strategy(trend)
+    report_path = write_market_report(output_dir, snapshot, results, trend, recommendation)
     table = Table(title=f"Market Snapshot: {symbol}")
     table.add_column("Indicator")
     table.add_column("Value", justify="right")
@@ -68,6 +70,7 @@ def analyze_market(
     console.print(f"Trend Score: {trend.trend_score.value:.1f}")
     console.print(f"Confidence: {trend.confidence.value:.0%}")
     console.print(trend.explanation)
+    console.print(f"Recommendation: {recommendation.strategy.replace('_', ' ').title()}")
     console.print(f"Report saved: {report_path}")
 
 

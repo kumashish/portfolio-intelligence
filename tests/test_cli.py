@@ -35,4 +35,4 @@ def test_analyze_market_command_renders_indicators(
     assert result.exit_code == 0
     assert "Market Snapshot: SPY" in result.output
     assert "EMA200" in result.output
-    assert len(list(tmp_path.glob("SPY_*.json"))) == 1
+    assert len(list(tmp_path.glob("SPY_*.txt"))) == 1

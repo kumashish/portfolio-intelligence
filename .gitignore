@@ -9,4 +9,4 @@ dist/
 build/
 .coverage
 coverage.xml
-reports/market/*.json
+reports/market/*.txt
