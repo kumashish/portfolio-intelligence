@@ -72,6 +72,4 @@ jobs:
     token: ${{ secrets.GITHUB_TOKEN }}
     event-type: update-readme
     client-payload: '{"source_workflow":"${{ github.workflow }}","ref":"${{ github.ref }}"}'
-
-          git pull --rebase origin main
-          git push origin HEAD:main
+    
