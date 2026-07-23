@@ -1,0 +1,43 @@
+PORTFOLIO INTELLIGENCE ENGINE
+================================
+
+Generated At : 2026-07-23 19:56:01 UTC
+Symbol       : SPY
+Last Price   : 737.52
+
+MARKET INTELLIGENCE
+-------------------
+Regime       : Bull
+Trend Score  : 7.5 / 10
+Confidence   : 100%
+
+INDICATORS
+----------
+EMA20       : 745.75
+EMA50       : 738.88
+EMA200      : 698.96
+RSI(14)     : 44.12
+ATR(14)     : 8.28
+ADX(14)     : 18.67
+
+RECOMMENDATION
+--------------
+Strategy     : Call Debit Spread
+Actionable   : Yes
+Rationale    : Confirmed bullish trend supports a directional call debit spread.
+- Select strikes and expiry only after checking live option-chain liquidity and pricing.
+- This is an advisory signal, not an execution instruction.
+
+TREND EXPLANATION
+-----------------
+Trend Score: 7.5
+
+Reason:
+[PASS] Price is above EMA200.
+[PASS] EMA20 is above EMA50.
+[PASS] EMA50 is above EMA200.
+[FAIL] RSI is outside the healthy range.
+[FAIL] ADX does not indicate a strong trend.
+[PASS] ATR is expanding.
+[FAIL] Price is not making higher highs.
+[FAIL] Price is not making higher lows.

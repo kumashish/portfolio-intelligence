@@ -2,4 +2,5 @@
 
 `pie analyze-market` writes one timestamped dashboard-style text report to this directory by default.
 
-Generated text reports are ignored by Git. GitHub Actions uploads each scheduled run's reports as a workflow artifact.
+Scheduled workflows commit generated text reports directly to this directory. This makes each report
+available as a regular file in the repository rather than a ZIP artifact download.

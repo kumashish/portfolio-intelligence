@@ -7,15 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   analyze-us-market:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        symbol: [SPY, QQQ]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -28,14 +24,15 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Analyze ${{ matrix.symbol }}
-        run: uv run pie analyze-market "${{ matrix.symbol }}"
+      - name: Analyze SPY and QQQ
+        run: |
+          uv run pie analyze-market SPY
+          uv run pie analyze-market QQQ
 
-      - name: Upload ${{ matrix.symbol }} report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: market-analysis-${{ matrix.symbol }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: reports/market/
-          if-no-files-found: warn
-          retention-days: 90
+      - name: Commit market reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/market/*.txt
+          git diff --cached --quiet || git commit -m "chore: store US market reports"
+          git push
