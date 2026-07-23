@@ -11,10 +11,10 @@ app = typer.Typer(help="Portfolio Intelligence Engine.", no_args_is_help=True)
 console = Console()
 
 
-@app.command()
-def analyze(symbol: str) -> None:
-    """Placeholder command for analyzing a symbol."""
-    console.print(f"Analysis for {symbol} is not implemented yet.")
+@app.command("analyze-market")
+def analyze_market(symbol: str) -> None:
+    """Placeholder command for analyzing market data for a symbol."""
+    console.print(f"Market analysis for {symbol} is not implemented yet.")
 
 
 @app.command()

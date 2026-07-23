@@ -2,7 +2,9 @@
 
 from abc import ABC, abstractmethod
 
-from pie.core.models import MarketSnapshot, PortfolioSnapshot, TrendAnalysis
+import polars as pl
+
+from pie.core.models import PortfolioSnapshot, TrendAnalysis
 
 
 class Provider(ABC):
@@ -15,11 +17,11 @@ class Provider(ABC):
 
 
 class MarketDataProvider(Provider):
-    """Supplies market snapshots."""
+    """Supplies canonical OHLCV market history."""
 
     @abstractmethod
-    def fetch_market_snapshot(self, symbol: str) -> MarketSnapshot:
-        """Fetch the current market snapshot for a symbol."""
+    def fetch_history(self, symbol: str, *, period: str, interval: str) -> pl.DataFrame:
+        """Fetch market history for a symbol as a Polars DataFrame."""
 
 
 class PortfolioProvider(Provider):
