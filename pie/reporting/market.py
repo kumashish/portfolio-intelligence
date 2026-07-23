@@ -31,42 +31,48 @@ def write_market_report(
     ]
     limitation_lines = [f"- {limitation}" for limitation in recommendation.limitations]
     trade_lines = _trade_lines(estimated_trade)
-    dashboard = "\n".join(
-        [
-            "PORTFOLIO INTELLIGENCE ENGINE",
-            "=" * 32,
-            "",
-            f"Generated At : {generated_at:%Y-%m-%d %H:%M:%S UTC}",
-            f"Symbol       : {snapshot.symbol}",
-            f"Last Price   : {float(snapshot.last_price):,.2f}",
-            "",
-            "MARKET INTELLIGENCE",
-            "-" * 19,
-            f"Regime       : {trend.regime.replace('_', ' ').title()}",
-            f"Trend Score  : {trend.trend_score.value:.1f} / 10",
-            f"Confidence   : {trend.confidence.value:.0%}",
-            "",
-            "INDICATORS",
-            "-" * 10,
-            *indicator_lines,
-            "",
-            "RECOMMENDATION",
-            "-" * 14,
-            f"Strategy     : {recommendation.strategy.replace('_', ' ').title()}",
-            f"Actionable   : {'Yes' if recommendation.actionable else 'No'}",
-            f"Rationale    : {recommendation.rationale}",
-            *limitation_lines,
-            "",
-            "SUGGESTED TRADE",
-            "-" * 15,
-            *trade_lines,
-            "",
-            "TREND EXPLANATION",
-            "-" * 17,
-            trend.explanation,
-            "",
-        ]
-    )
+   dashboard = "\n".join(
+    [
+        "PORTFOLIO INTELLIGENCE ENGINE",
+        "=" * 32,
+        "",
+        f"Generated At : {generated_at:%Y-%m-%d %H:%M:%S UTC}",
+        f"Symbol       : {snapshot.symbol}",
+        f"Last Price   : {float(snapshot.last_price):,.2f}",
+        "",
+        "TRADE RECOMMENDATION",
+        "=" * 20,
+        f"Strategy     : {recommendation.strategy.replace('_', ' ').title()}",
+        f"Actionable   : {'✅ Yes' if recommendation.actionable else '❌ No'}",
+        "",
+        "SUGGESTED TRADE",
+        "=" * 15,
+        *trade_lines,
+        "",
+        "Rationale",
+        "-" * 9,
+        recommendation.rationale,
+        *(
+            ["", "Limitations", "-" * 11, *limitation_lines]
+            if limitation_lines
+            else []
+        ),
+        "",
+        "MARKET INTELLIGENCE",
+        "-" * 19,
+        f"Regime       : {trend.regime.replace('_', ' ').title()}",
+        f"Trend Score  : {trend.trend_score.value:.1f} / 10",
+        f"Confidence   : {trend.confidence.value:.0%}",
+        "",
+        "INDICATORS",
+        "-" * 10,
+        *indicator_lines,
+        "",
+        "TREND EXPLANATION",
+        "-" * 17,
+        trend.explanation,
+    ]
+)
     output_dir.mkdir(parents=True, exist_ok=True)
     report_path.write_text(dashboard, encoding="utf-8")
     return report_path
@@ -75,10 +81,10 @@ def write_market_report(
 def _trade_lines(estimated_trade: EstimatedTrade | None) -> list[str]:
     if estimated_trade is None:
         return ["No Trade: a live VIX-based estimate is unavailable for this run."]
-    leg_lines = [
-        f"{leg.action.title()} {leg.right.title()} : {leg.strike:,.2f}"
-        for leg in estimated_trade.legs
-    ]
+leg_lines = [
+    f"{leg.action.title()} {leg.right.title():<4}: {leg.strike:,.2f}"
+    for leg in estimated_trade.legs
+]
     exit_lines = [f"- {rule}" for rule in estimated_trade.exit_strategy]
     return [
         f"Expiry       : {estimated_trade.expiration.isoformat()}",
