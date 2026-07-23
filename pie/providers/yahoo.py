@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 from urllib.error import HTTPError
 from urllib.parse import urlencode
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 import polars as pl
 import structlog
@@ -16,7 +16,7 @@ from pie.providers.interfaces import MarketDataProvider
 
 logger = structlog.get_logger(__name__)
 
-YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
+YAHOO_CHART_URL = "https://query2.finance.yahoo.com/v8/finance/chart"
 
 
 class HTTPResponse(Protocol):
@@ -58,8 +58,9 @@ class UrllibHTTPClient:
     def get(self, url: str, *, params: Mapping[str, str]) -> HTTPResponse:
         """Issue a GET request and decode its JSON response."""
         request_url = f"{url}?{urlencode(params)}"
+        request = Request(request_url, headers={"User-Agent": "Mozilla/5.0"})
         try:
-            with urlopen(request_url, timeout=self.timeout_seconds) as response:
+            with urlopen(request, timeout=self.timeout_seconds) as response:
                 return JSONResponse(
                     status_code=response.status, payload=json.loads(response.read())
                 )
@@ -133,5 +134,6 @@ class YahooFinanceProvider(MarketDataProvider):
             }
         )
         return data.with_columns(
-            pl.from_epoch(pl.col("timestamp").cast(pl.Int64), time_unit="s").alias("timestamp")
-        )
+            pl.from_epoch(pl.col("timestamp").cast(pl.Int64), time_unit="s").alias("timestamp"),
+            pl.col("volume").fill_null(0).alias("volume"),
+        ).drop_nulls(subset=["open", "high", "low", "close"])

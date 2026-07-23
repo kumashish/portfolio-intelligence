@@ -43,7 +43,7 @@ def yahoo_payload() -> dict[str, Any]:
                                 "high": [472.0, 473.0],
                                 "low": [469.0, 470.0],
                                 "close": [471.0, 472.0],
-                                "volume": [100, 200],
+                                "volume": [100, None],
                             }
                         ]
                     },
@@ -60,6 +60,7 @@ def test_yahoo_provider_normalizes_mocked_response() -> None:
 
     assert data.columns == ["timestamp", "open", "high", "low", "close", "volume"]
     assert data.height == 2
+    assert data.get_column("volume").to_list() == [100, 0]
     assert client.request is not None
     assert client.request[1] == {"range": "5d", "interval": "1d"}
 
