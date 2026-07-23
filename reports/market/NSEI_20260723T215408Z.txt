@@ -1,0 +1,65 @@
+PORTFOLIO INTELLIGENCE ENGINE
+================================
+
+Generated At : 2026-07-23 21:54:08 UTC
+Symbol       : ^NSEI
+Last Price   : 23,996.25
+
+TRADE RECOMMENDATION
+====================
+Strategy     : Put Debit Spread
+Actionable   : ✅ Yes
+
+SUGGESTED TRADE
+===============
+Expiry       : 2026-08-25
+Expected Move: 958.91
+VIX          : 13.29
+VIX Source   : live ^INDIAVIX
+Buy Put : 24,000.00
+Sell Put : 23,300.00
+
+Exit Strategy:
+- Exit if the trend regime becomes Neutral, Bull, or Strong Bull.
+- Exit if spot closes above EMA50.
+- Reassess or close at 21 days to expiry.
+
+Estimated from spot and annualized VIX only; premiums, liquidity, and execution are not included.
+
+Rationale
+---------
+Confirmed bearish trend supports a directional put debit spread.
+
+Limitations
+-----------
+- Validate estimated strikes and expiry against live option-chain liquidity and pricing.
+- This is an advisory signal, not an execution instruction.
+
+MARKET INTELLIGENCE
+-------------------
+Regime       : Bear
+Trend Score  : 3.5 / 10
+Confidence   : 100%
+
+INDICATORS
+----------
+EMA20       : 24,084.42
+EMA50       : 23,992.85
+EMA200      : 24,407.75
+RSI(14)     : 48.61
+ATR(14)     : 236.81
+ADX(14)     : 9.61
+
+TREND EXPLANATION
+-----------------
+Trend Score: 3.5
+
+Reason:
+[FAIL] Price is below EMA200.
+[PASS] EMA20 is above EMA50.
+[FAIL] EMA50 is not above EMA200.
+[PASS] RSI is healthy.
+[FAIL] ADX does not indicate a strong trend.
+[PASS] ATR is expanding.
+[FAIL] Price is not making higher highs.
+[FAIL] Price is not making higher lows.
