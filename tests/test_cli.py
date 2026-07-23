@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import polars as pl
 import pytest
@@ -10,7 +11,9 @@ from pie.providers.yahoo import YahooFinanceProvider
 runner = CliRunner()
 
 
-def test_analyze_market_command_renders_indicators(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_analyze_market_command_renders_indicators(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     data = pl.DataFrame(
         {
             "timestamp": [datetime(2026, 1, 1) + timedelta(days=index) for index in range(201)],
@@ -27,8 +30,9 @@ def test_analyze_market_command_renders_indicators(monkeypatch: pytest.MonkeyPat
         lambda _self, _symbol, *, period, interval: data,
     )
 
-    result = runner.invoke(cli_app.app, ["analyze-market", "SPY"])
+    result = runner.invoke(cli_app.app, ["analyze-market", "SPY", "--output-dir", str(tmp_path)])
 
     assert result.exit_code == 0
     assert "Market Snapshot: SPY" in result.output
     assert "EMA200" in result.output
+    assert len(list(tmp_path.glob("SPY_*.json"))) == 1

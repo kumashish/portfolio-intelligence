@@ -30,3 +30,12 @@ jobs:
 
       - name: Analyze ${{ matrix.symbol }}
         run: uv run pie analyze-market "${{ matrix.symbol }}"
+
+      - name: Upload ${{ matrix.symbol }} report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: market-analysis-${{ matrix.symbol }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: reports/market/
+          if-no-files-found: warn
+          retention-days: 90

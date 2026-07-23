@@ -16,6 +16,7 @@ from pie.market_data.csv_loader import load_ohlcv_csv
 from pie.market_data.exceptions import MarketDataError
 from pie.market_data.snapshots import SnapshotBuilder
 from pie.providers.yahoo import UrllibHTTPClient, YahooFinanceProvider
+from pie.reporting.market import write_market_report
 
 app = typer.Typer(help="Portfolio Intelligence Engine.", no_args_is_help=True)
 console = Console()
@@ -27,6 +28,9 @@ def analyze_market(
     config: Annotated[
         Path | None, typer.Option(help="Optional YAML indicator configuration.")
     ] = None,
+    output_dir: Annotated[
+        Path, typer.Option(help="Directory for the timestamped JSON analysis report.")
+    ] = Path("reports/market"),
 ) -> None:
     """Fetch market data and calculate configured technical indicators."""
     try:
@@ -51,6 +55,7 @@ def analyze_market(
         if application_config is not None
         else TrendWeights().as_mapping()
     ).analyze(snapshot, results, data)
+    report_path = write_market_report(output_dir, snapshot, results, trend)
     table = Table(title=f"Market Snapshot: {symbol}")
     table.add_column("Indicator")
     table.add_column("Value", justify="right")
@@ -63,6 +68,7 @@ def analyze_market(
     console.print(f"Trend Score: {trend.trend_score.value:.1f}")
     console.print(f"Confidence: {trend.confidence.value:.0%}")
     console.print(trend.explanation)
+    console.print(f"Report saved: {report_path}")
 
 
 @app.command("backtest-market")
