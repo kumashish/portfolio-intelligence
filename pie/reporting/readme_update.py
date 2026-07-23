@@ -15,7 +15,7 @@ class MarketRow(TypedDict):
     trend: str
     strategy: str
     signal: str
-    since: str  # "N days (YYYY-MM-DD HH:MM IST)"
+    since: str  # "Today, HH:MM" or "Jul 20, HH:MM IST"
 
 
 def utc_to_ist(dt: datetime) -> datetime:
@@ -40,7 +40,7 @@ def format_ist_time(dt: datetime, include_date: bool = False) -> str:
 def calculate_since(
     signal_date: datetime, current_time: datetime | None = None
 ) -> tuple[str, datetime]:
-    """Calculate 'since' duration and format it.
+    """Calculate 'since' duration and format it in hybrid style.
 
     Args:
         signal_date: when the signal was activated
@@ -48,6 +48,7 @@ def calculate_since(
 
     Returns:
         Tuple of (formatted_string, signal_date_in_ist)
+        formatted_string examples: "Today, 15:20", "Yesterday, 09:15", "Jul 20, 14:30 IST"
     """
     if current_time is None:
         current_time = datetime.now(UTC)
@@ -56,13 +57,16 @@ def calculate_since(
     current_ist = utc_to_ist(current_time)
 
     delta_days = (current_ist.date() - signal_ist.date()).days
+    time_str = signal_ist.strftime("%H:%M")
 
     if delta_days == 0:
-        return "Today", signal_ist
+        return f"Today, {time_str}", signal_ist
     elif delta_days == 1:
-        return "Yesterday", signal_ist
+        return f"Yesterday, {time_str}", signal_ist
     else:
-        return f"{delta_days} days", signal_ist
+        # Format as "Mon DD, HH:MM IST" for older dates
+        date_str = signal_ist.strftime("%b %d")
+        return f"{date_str}, {time_str} IST", signal_ist
 
 
 def generate_readme_snapshot(
@@ -88,8 +92,8 @@ def generate_readme_snapshot(
     if current_time is None:
         current_time = datetime.now(UTC)
 
-    rows = ["| Market    | Updated   | Trend      | Strategy          | Signal | Since  |"]
-    rows.append("| --------- | --------- | ---------- | ----------------- | ------ | ------ |")
+    rows = ["| Market    | Updated   | Trend      | Strategy          | Signal | Since          |"]
+    rows.append("| --------- | --------- | ---------- | ----------------- | ------ | -------------- |")
 
     for data in market_data:
         market = data["market"]
@@ -99,9 +103,8 @@ def generate_readme_snapshot(
         signal = data["signal"]
 
         since_text, signal_ist = calculate_since(data["signal_since"], current_time)
-        since_full = f"{since_text} ({signal_ist.strftime('%Y-%m-%d %H:%M IST')})"
 
-        row = f"| {market:<9} | {updated_time:<9} | {trend:<10} | {strategy:<17} | {signal:<6} | {since_full:<29} |"
+        row = f"| {market:<9} | {updated_time:<9} | {trend:<10} | {strategy:<17} | {signal:<6} | {since_text:<14} |"
         rows.append(row)
 
     return "\n".join(rows)
