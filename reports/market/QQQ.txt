@@ -1,14 +1,14 @@
-2026-07-23 21:57:39 [info     ] market_data_fetched            interval=1d period=2y provider=yahoo_finance rows=501 symbol=QQQ
-2026-07-23 21:57:39 [info     ] indicator_calculated           duration_ms=0.979 indicator=EMA20 rows=501 status=OK
-2026-07-23 21:57:39 [info     ] indicator_calculated           duration_ms=0.275 indicator=EMA50 rows=501 status=OK
-2026-07-23 21:57:39 [info     ] indicator_calculated           duration_ms=0.228 indicator=EMA200 rows=501 status=OK
-2026-07-23 21:57:40 [info     ] indicator_calculated           duration_ms=1.027 indicator=RSI(14) rows=501 status=OK
-2026-07-23 21:57:40 [info     ] indicator_calculated           duration_ms=0.855 indicator=ATR(14) rows=501 status=OK
-2026-07-23 21:57:40 [info     ] indicator_calculated           duration_ms=4.475 indicator=ADX(14) rows=501 status=OK
-2026-07-23 21:57:40 [info     ] market_data_validated          columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'] rows=501
-2026-07-23 21:57:40 [info     ] market_snapshots_built         count=501 symbol=QQQ
-2026-07-23 21:57:40 [info     ] trend_analysis_completed       confidence=1.0 regime=bull score=7.0 symbol=QQQ
-2026-07-23 21:57:40 [info     ] market_data_fetched            interval=1d period=5d provider=yahoo_finance rows=5 symbol=^VIX
+2026-07-23 23:26:09 [info     ] market_data_fetched            interval=1d period=2y provider=yahoo_finance rows=501 symbol=QQQ
+2026-07-23 23:26:09 [info     ] indicator_calculated           duration_ms=0.636 indicator=EMA20 rows=501 status=OK
+2026-07-23 23:26:09 [info     ] indicator_calculated           duration_ms=0.274 indicator=EMA50 rows=501 status=OK
+2026-07-23 23:26:09 [info     ] indicator_calculated           duration_ms=0.305 indicator=EMA200 rows=501 status=OK
+2026-07-23 23:26:09 [info     ] indicator_calculated           duration_ms=1.16 indicator=RSI(14) rows=501 status=OK
+2026-07-23 23:26:09 [info     ] indicator_calculated           duration_ms=0.947 indicator=ATR(14) rows=501 status=OK
+2026-07-23 23:26:09 [info     ] indicator_calculated           duration_ms=4.748 indicator=ADX(14) rows=501 status=OK
+2026-07-23 23:26:09 [info     ] market_data_validated          columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'] rows=501
+2026-07-23 23:26:09 [info     ] market_snapshots_built         count=501 symbol=QQQ
+2026-07-23 23:26:09 [info     ] trend_analysis_completed       confidence=1.0 regime=bull score=7.0 symbol=QQQ
+2026-07-23 23:26:09 [info     ] market_data_fetched            interval=1d period=5d provider=yahoo_finance rows=5 symbol=^VIX
  Market Snapshot: QQQ  
 ┏━━━━━━━━━━━━┳━━━━━━━━┓
 ┃ Indicator  ┃  Value ┃
@@ -37,4 +37,4 @@ Reason:
 [FAIL] Price is not making higher lows.
 Recommendation: Call Debit Spread
 Suggested expiry: 2026-08-25
-Report saved: reports/market/QQQ_20260723T215740Z.txt
+Report saved: reports/market/QQQ_20260723T232609Z.txt

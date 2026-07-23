@@ -1,14 +1,14 @@
-2026-07-23 21:57:38 [info     ] market_data_fetched            interval=1d period=2y provider=yahoo_finance rows=501 symbol=SPY
-2026-07-23 21:57:38 [info     ] indicator_calculated           duration_ms=0.894 indicator=EMA20 rows=501 status=OK
-2026-07-23 21:57:38 [info     ] indicator_calculated           duration_ms=0.289 indicator=EMA50 rows=501 status=OK
-2026-07-23 21:57:38 [info     ] indicator_calculated           duration_ms=0.226 indicator=EMA200 rows=501 status=OK
-2026-07-23 21:57:38 [info     ] indicator_calculated           duration_ms=1.161 indicator=RSI(14) rows=501 status=OK
-2026-07-23 21:57:38 [info     ] indicator_calculated           duration_ms=0.887 indicator=ATR(14) rows=501 status=OK
-2026-07-23 21:57:38 [info     ] indicator_calculated           duration_ms=4.528 indicator=ADX(14) rows=501 status=OK
-2026-07-23 21:57:38 [info     ] market_data_validated          columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'] rows=501
-2026-07-23 21:57:38 [info     ] market_snapshots_built         count=501 symbol=SPY
-2026-07-23 21:57:38 [info     ] trend_analysis_completed       confidence=1.0 regime=bull score=7.5 symbol=SPY
-2026-07-23 21:57:39 [info     ] market_data_fetched            interval=1d period=5d provider=yahoo_finance rows=5 symbol=^VIX
+2026-07-23 23:26:08 [info     ] market_data_fetched            interval=1d period=2y provider=yahoo_finance rows=501 symbol=SPY
+2026-07-23 23:26:08 [info     ] indicator_calculated           duration_ms=0.635 indicator=EMA20 rows=501 status=OK
+2026-07-23 23:26:08 [info     ] indicator_calculated           duration_ms=0.287 indicator=EMA50 rows=501 status=OK
+2026-07-23 23:26:08 [info     ] indicator_calculated           duration_ms=0.254 indicator=EMA200 rows=501 status=OK
+2026-07-23 23:26:08 [info     ] indicator_calculated           duration_ms=1.113 indicator=RSI(14) rows=501 status=OK
+2026-07-23 23:26:08 [info     ] indicator_calculated           duration_ms=0.913 indicator=ATR(14) rows=501 status=OK
+2026-07-23 23:26:08 [info     ] indicator_calculated           duration_ms=4.738 indicator=ADX(14) rows=501 status=OK
+2026-07-23 23:26:08 [info     ] market_data_validated          columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'] rows=501
+2026-07-23 23:26:08 [info     ] market_snapshots_built         count=501 symbol=SPY
+2026-07-23 23:26:08 [info     ] trend_analysis_completed       confidence=1.0 regime=bull score=7.5 symbol=SPY
+2026-07-23 23:26:08 [info     ] market_data_fetched            interval=1d period=5d provider=yahoo_finance rows=5 symbol=^VIX
  Market Snapshot: SPY  
 ┏━━━━━━━━━━━━┳━━━━━━━━┓
 ┃ Indicator  ┃  Value ┃
@@ -37,4 +37,4 @@ Reason:
 [FAIL] Price is not making higher lows.
 Recommendation: Call Debit Spread
 Suggested expiry: 2026-08-25
-Report saved: reports/market/SPY_20260723T215739Z.txt
+Report saved: reports/market/SPY_20260723T232608Z.txt
