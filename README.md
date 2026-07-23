@@ -1,10 +1,12 @@
 <!-- MARKET-SNAPSHOT-START -->
-Market	Updated	Trend	Strategy	Signal	Since
-NIFTY 50	15:20 IST	🟢 Bull	Call Debit Spread	NEW	Today
-BANKNIFTY	15:20 IST	🟢 Bull	Put Credit Spread	Active	3 days
-SPY	21:35 UTC	🟡 Neutral	Iron Condor	Hold	5 days
-QQQ	21:35 UTC	🔴 Bear	Put Debit Spread	NEW	Today
+| Market    | Updated   | Trend      | Strategy          | Signal | Since  |
+| --------- | --------- | ---------- | ----------------- | ------ | ------ |
+| NIFTY 50  | 15:20 IST | 🟢 Bull    | Call Debit Spread | NEW    | Today  |
+| BANKNIFTY | 15:20 IST | 🟢 Bull    | Put Credit Spread | Active | 3 days |
+| SPY       | 21:35 UTC | 🟡 Neutral | Iron Condor       | Hold   | 5 days |
+| QQQ       | 21:35 UTC | 🔴 Bear    | Put Debit Spread  | NEW    | Today  |
 <!-- MARKET-SNAPSHOT-END -->
+
 # Portfolio Intelligence
 
 A personal market and options decision engine for systematic premium selling, directional overlays, and adaptive learning.
