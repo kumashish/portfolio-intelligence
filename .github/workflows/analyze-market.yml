@@ -1,21 +1,22 @@
 name: Analyze Market
 
 concurrency:
-  group: us-market-analysis
+  group: market-analysis
   cancel-in-progress: false
-  
+
 on:
   schedule:
-    # GitHub Actions schedules use UTC. These correspond to 10:30, 13:30, and 15:20 IST.
+    # 10:30, 13:30 and 15:20 IST
     - cron: "0 5 * * *"
     - cron: "0 8 * * *"
     - cron: "50 9 * * *"
+
   workflow_dispatch:
     inputs:
       symbol:
-        description: Yahoo Finance symbol to analyze
+        description: Yahoo Finance symbol (leave blank to run default symbols)
         required: false
-        default: ^NSEI
+        default: ""
         type: string
 
 permissions:
@@ -24,8 +25,7 @@ permissions:
 jobs:
   analyze-market:
     runs-on: ubuntu-latest
-    env:
-      PIE_SYMBOL: ${{ inputs.symbol || '^NSEI' }}
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -39,12 +39,31 @@ jobs:
         run: uv sync --locked
 
       - name: Analyze market
-        run: uv run pie analyze-market "$PIE_SYMBOL"
+        run: |
+          if [ -n "${{ inputs.symbol }}" ]; then
+            SYMBOLS="${{ inputs.symbol }}"
+          else
+            SYMBOLS="^NSEI ^NSEBANK"
+          fi
 
-      - name: Commit market report
+          for SYMBOL in $SYMBOLS; do
+            echo "Analyzing ${SYMBOL}"
+            uv run pie analyze-market "$SYMBOL"
+          done
+
+      - name: Commit market reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/market/*.txt
-          git diff --cached --quiet || git commit -m "chore: store $PIE_SYMBOL market report"
-          git push
+
+          git add reports/market/
+
+          if git diff --cached --quiet; then
+            echo "No report changes."
+            exit 0
+          fi
+
+          git commit -m "chore: update market reports"
+
+          git pull --rebase origin main
+          git push origin HEAD:main
