@@ -1,0 +1,32 @@
+name: Analyze U.S. Market
+
+on:
+  schedule:
+    # GitHub Actions schedules use UTC. This corresponds to 19:00 IST.
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-us-market:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        symbol: [SPY, QQQ]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Analyze ${{ matrix.symbol }}
+        run: uv run pie analyze-market "${{ matrix.symbol }}"
