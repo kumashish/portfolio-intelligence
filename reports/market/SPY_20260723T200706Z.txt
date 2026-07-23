@@ -1,0 +1,58 @@
+PORTFOLIO INTELLIGENCE ENGINE
+================================
+
+Generated At : 2026-07-23 20:07:06 UTC
+Symbol       : SPY
+Last Price   : 738.30
+
+MARKET INTELLIGENCE
+-------------------
+Regime       : Bull
+Trend Score  : 7.5 / 10
+Confidence   : 100%
+
+INDICATORS
+----------
+EMA20       : 745.82
+EMA50       : 738.91
+EMA200      : 698.88
+RSI(14)     : 44.64
+ATR(14)     : 8.28
+ADX(14)     : 18.67
+
+RECOMMENDATION
+--------------
+Strategy     : Call Debit Spread
+Actionable   : Yes
+Rationale    : Confirmed bullish trend supports a directional call debit spread.
+- Select strikes and expiry only after checking live option-chain liquidity and pricing.
+- This is an advisory signal, not an execution instruction.
+
+SUGGESTED TRADE
+---------------
+Expiry       : 2026-08-25
+Expected Move: 42.34
+VIX          : 19.37
+Buy Call : 738.00
+Sell Call : 770.00
+
+Exit Strategy:
+- Exit if the trend regime becomes Neutral, Bear, or Strong Bear.
+- Exit if spot closes below EMA50.
+- Reassess or close at 21 days to expiry.
+
+Estimated from spot and annualized VIX only; premiums, liquidity, and execution are not included.
+
+TREND EXPLANATION
+-----------------
+Trend Score: 7.5
+
+Reason:
+[PASS] Price is above EMA200.
+[PASS] EMA20 is above EMA50.
+[PASS] EMA50 is above EMA200.
+[FAIL] RSI is outside the healthy range.
+[FAIL] ADX does not indicate a strong trend.
+[PASS] ATR is expanding.
+[FAIL] Price is not making higher highs.
+[FAIL] Price is not making higher lows.

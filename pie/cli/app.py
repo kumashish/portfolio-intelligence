@@ -1,5 +1,6 @@
 """Typer command-line interface."""
 
+from decimal import Decimal
 from pathlib import Path
 from typing import Annotated
 
@@ -11,7 +12,8 @@ from pie.config.loader import load_config
 from pie.config.models import TrendWeights
 from pie.market.backtest.engine import TrendBacktester
 from pie.market.indicators.engine import IndicatorEngine
-from pie.market.strategy import select_strategy
+from pie.market.strategy import StrategyRecommendation, select_strategy
+from pie.market.trade_estimate import EstimatedTrade, estimate_trade
 from pie.market.trend.engine import TrendEngine
 from pie.market_data.csv_loader import load_ohlcv_csv
 from pie.market_data.exceptions import MarketDataError
@@ -30,7 +32,7 @@ def analyze_market(
         Path | None, typer.Option(help="Optional YAML indicator configuration.")
     ] = None,
     output_dir: Annotated[
-        Path, typer.Option(help="Directory for the timestamped JSON analysis report.")
+        Path, typer.Option(help="Directory for the timestamped text analysis report.")
     ] = Path("reports/market"),
 ) -> None:
     """Fetch market data and calculate configured technical indicators."""
@@ -57,7 +59,15 @@ def analyze_market(
         else TrendWeights().as_mapping()
     ).analyze(snapshot, results, data)
     recommendation = select_strategy(trend)
-    report_path = write_market_report(output_dir, snapshot, results, trend, recommendation)
+    estimated_trade = _estimate_trade(symbol, snapshot.last_price, recommendation)
+    report_path = write_market_report(
+        output_dir,
+        snapshot,
+        results,
+        trend,
+        recommendation,
+        estimated_trade,
+    )
     table = Table(title=f"Market Snapshot: {symbol}")
     table.add_column("Indicator")
     table.add_column("Value", justify="right")
@@ -71,6 +81,8 @@ def analyze_market(
     console.print(f"Confidence: {trend.confidence.value:.0%}")
     console.print(trend.explanation)
     console.print(f"Recommendation: {recommendation.strategy.replace('_', ' ').title()}")
+    if estimated_trade is not None:
+        console.print(f"Suggested expiry: {estimated_trade.expiration.isoformat()}")
     console.print(f"Report saved: {report_path}")
 
 
@@ -143,3 +155,21 @@ def config_check(path: Path) -> None:
 def main() -> None:
     """Run the CLI application."""
     app()
+
+
+def _estimate_trade(
+    symbol: str, spot_price: Decimal, recommendation: StrategyRecommendation
+) -> EstimatedTrade | None:
+    if not recommendation.actionable:
+        return None
+    vix_symbol = "^INDIAVIX" if symbol == "^NSEI" else "^VIX"
+    try:
+        vix_data = YahooFinanceProvider(UrllibHTTPClient()).fetch_history(
+            vix_symbol,
+            period="5d",
+            interval="1d",
+        )
+    except MarketDataError:
+        return None
+    vix = float(vix_data.get_column("close").tail(1).item())
+    return estimate_trade(symbol, float(spot_price), vix, recommendation)

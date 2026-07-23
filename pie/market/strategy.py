@@ -44,7 +44,7 @@ def select_strategy(analysis: TrendAnalysis) -> StrategyRecommendation:
             actionable=True,
             rationale="Confirmed bullish trend supports a directional call debit spread.",
             limitations=(
-                "Select strikes and expiry only after checking live option-chain liquidity "
+                "Validate estimated strikes and expiry against live option-chain liquidity "
                 "and pricing.",
                 "This is an advisory signal, not an execution instruction.",
             ),
@@ -55,7 +55,7 @@ def select_strategy(analysis: TrendAnalysis) -> StrategyRecommendation:
             actionable=True,
             rationale="Confirmed bearish trend supports a directional put debit spread.",
             limitations=(
-                "Select strikes and expiry only after checking live option-chain liquidity "
+                "Validate estimated strikes and expiry against live option-chain liquidity "
                 "and pricing.",
                 "This is an advisory signal, not an execution instruction.",
             ),

@@ -36,6 +36,7 @@ def test_write_market_report_creates_timestamped_dashboard(tmp_path: Path) -> No
             actionable=True,
             rationale="Test recommendation",
         ),
+        None,
     )
 
     dashboard = report_path.read_text(encoding="utf-8")
@@ -44,3 +45,4 @@ def test_write_market_report_creates_timestamped_dashboard(tmp_path: Path) -> No
     assert report_path.suffix == ".txt"
     assert "PORTFOLIO INTELLIGENCE ENGINE" in dashboard
     assert "Strategy     : Call Debit Spread" in dashboard
+    assert "No Trade: a live VIX-based estimate is unavailable" in dashboard

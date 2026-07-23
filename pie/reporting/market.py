@@ -7,6 +7,7 @@ from pathlib import Path
 from pie.core.models import MarketSnapshot
 from pie.market.indicators.base import IndicatorResult
 from pie.market.strategy import StrategyRecommendation
+from pie.market.trade_estimate import EstimatedTrade
 from pie.market.trend.models import TrendAnalysis
 
 
@@ -16,6 +17,7 @@ def write_market_report(
     indicators: dict[str, IndicatorResult],
     trend: TrendAnalysis,
     recommendation: StrategyRecommendation,
+    estimated_trade: EstimatedTrade | None,
 ) -> Path:
     """Write one timestamped market dashboard and return its path."""
     generated_at = datetime.now(UTC)
@@ -28,6 +30,7 @@ def write_market_report(
         for name, result in indicators.items()
     ]
     limitation_lines = [f"- {limitation}" for limitation in recommendation.limitations]
+    trade_lines = _trade_lines(estimated_trade)
     dashboard = "\n".join(
         [
             "PORTFOLIO INTELLIGENCE ENGINE",
@@ -54,6 +57,10 @@ def write_market_report(
             f"Rationale    : {recommendation.rationale}",
             *limitation_lines,
             "",
+            "SUGGESTED TRADE",
+            "-" * 15,
+            *trade_lines,
+            "",
             "TREND EXPLANATION",
             "-" * 17,
             trend.explanation,
@@ -63,3 +70,24 @@ def write_market_report(
     output_dir.mkdir(parents=True, exist_ok=True)
     report_path.write_text(dashboard, encoding="utf-8")
     return report_path
+
+
+def _trade_lines(estimated_trade: EstimatedTrade | None) -> list[str]:
+    if estimated_trade is None:
+        return ["No Trade: a live VIX-based estimate is unavailable for this run."]
+    leg_lines = [
+        f"{leg.action.title()} {leg.right.title()} : {leg.strike:,.2f}"
+        for leg in estimated_trade.legs
+    ]
+    exit_lines = [f"- {rule}" for rule in estimated_trade.exit_strategy]
+    return [
+        f"Expiry       : {estimated_trade.expiration.isoformat()}",
+        f"Expected Move: {estimated_trade.expected_move:,.2f}",
+        f"VIX          : {estimated_trade.annualized_vix:.2f}",
+        *leg_lines,
+        "",
+        "Exit Strategy:",
+        *exit_lines,
+        "",
+        estimated_trade.disclaimer,
+    ]
