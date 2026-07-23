@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 
 import polars as pl
 
-from pie.core.models import PortfolioSnapshot, TrendAnalysis
+from pie.core.models import PortfolioSnapshot
+from pie.market.trend.models import TrendAnalysis
 
 
 class Provider(ABC):

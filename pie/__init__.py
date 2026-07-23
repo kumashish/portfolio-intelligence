@@ -7,8 +7,8 @@ from pie.core.models import (
     Position,
     Recommendation,
     Trade,
-    TrendAnalysis,
 )
+from pie.market.trend.models import TrendAnalysis
 
 __all__ = [
     "Greeks",

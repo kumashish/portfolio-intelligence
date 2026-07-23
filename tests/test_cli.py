@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import polars as pl
 import pytest
 from typer.testing import CliRunner
@@ -11,7 +13,7 @@ runner = CliRunner()
 def test_analyze_market_command_renders_indicators(monkeypatch: pytest.MonkeyPatch) -> None:
     data = pl.DataFrame(
         {
-            "timestamp": list(range(201)),
+            "timestamp": [datetime(2026, 1, 1) + timedelta(days=index) for index in range(201)],
             "open": [100.0] * 201,
             "high": [101.0] * 201,
             "low": [99.0] * 201,

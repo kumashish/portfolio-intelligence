@@ -8,7 +8,6 @@ from pie.core.models import (
     Position,
     Recommendation,
     Trade,
-    TrendAnalysis,
 )
 
 __all__ = [
@@ -19,5 +18,4 @@ __all__ = [
     "Position",
     "Recommendation",
     "Trade",
-    "TrendAnalysis",
 ]

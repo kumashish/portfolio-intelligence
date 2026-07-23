@@ -102,16 +102,6 @@ class PortfolioSnapshot(DomainModel):
     positions: tuple[Position, ...] = ()
 
 
-class TrendAnalysis(DomainModel):
-    """Descriptive trend assessment for an instrument."""
-
-    symbol: str = Field(min_length=1)
-    analyzed_at: datetime
-    trend: str = Field(min_length=1)
-    confidence: Decimal = Field(ge=Decimal("0"), le=Decimal("1"))
-    summary: str = Field(min_length=1)
-
-
 class Recommendation(DomainModel):
     """An immutable recommendation derived from available analysis."""
 
