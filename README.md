@@ -31,3 +31,13 @@ It aims to improve the whole portfolio, not just a single position.
 ## Status
 
 Initial scaffold.
+
+## Backtesting
+
+Run a reproducible local NIFTY backtest with the included OHLCV dataset:
+
+```bash
+uv run pie backtest-market ^NSEI --data-path data/market/nifty50_25years_ohlcv_1999_2026.csv
+```
+
+The report evaluates directional trend signals against index returns; it does not model option-spread pricing.

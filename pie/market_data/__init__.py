@@ -1,5 +1,6 @@
 """Market data retrieval, validation, and snapshot construction."""
 
+from pie.market_data.csv_loader import load_ohlcv_csv
 from pie.market_data.exceptions import (
     MarketDataError,
     ProviderUnavailable,
@@ -16,4 +17,5 @@ __all__ = [
     "SnapshotBuilder",
     "SnapshotError",
     "ValidationError",
+    "load_ohlcv_csv",
 ]

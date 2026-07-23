@@ -12,6 +12,7 @@ from pie.config.models import TrendWeights
 from pie.market.backtest.engine import TrendBacktester
 from pie.market.indicators.engine import IndicatorEngine
 from pie.market.trend.engine import TrendEngine
+from pie.market_data.csv_loader import load_ohlcv_csv
 from pie.market_data.exceptions import MarketDataError
 from pie.market_data.snapshots import SnapshotBuilder
 from pie.providers.yahoo import UrllibHTTPClient, YahooFinanceProvider
@@ -70,17 +71,23 @@ def backtest_market(
     config: Annotated[
         Path | None, typer.Option(help="Optional YAML indicator and trend configuration.")
     ] = None,
+    data_path: Annotated[
+        Path | None, typer.Option(help="Optional local Date/Open/High/Low/Close/Volume CSV file.")
+    ] = None,
 ) -> None:
     """Backtest directional trend signals against historical index returns."""
-    try:
-        data = YahooFinanceProvider(UrllibHTTPClient()).fetch_history(
-            symbol,
-            period="5y",
-            interval="1d",
-        )
-    except MarketDataError as error:
-        console.print(f"Unable to backtest {symbol}: {error}", style="red")
-        raise typer.Exit(code=1) from error
+    if data_path is not None:
+        data = load_ohlcv_csv(data_path)
+    else:
+        try:
+            data = YahooFinanceProvider(UrllibHTTPClient()).fetch_history(
+                symbol,
+                period="5y",
+                interval="1d",
+            )
+        except MarketDataError as error:
+            console.print(f"Unable to backtest {symbol}: {error}", style="red")
+            raise typer.Exit(code=1) from error
     application_config = load_config(config) if config is not None else None
     configurations = application_config.indicators if application_config is not None else []
     indicator_engine = (
