@@ -64,6 +64,14 @@ jobs:
           fi
 
           git commit -m "chore: update market reports"
+          
+# snippet to add near the end of any workflow
+- name: Trigger README update
+  uses: peter-evans/repository-dispatch@v2
+  with:
+    token: ${{ secrets.GITHUB_TOKEN }}
+    event-type: update-readme
+    client-payload: '{"source_workflow":"${{ github.workflow }}","ref":"${{ github.ref }}"}'
 
           git pull --rebase origin main
           git push origin HEAD:main
