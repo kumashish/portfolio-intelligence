@@ -1,0 +1,40 @@
+2026-07-23 21:26:02 [info     ] market_data_fetched            interval=1d period=2y provider=yahoo_finance rows=501 symbol=SPY
+2026-07-23 21:26:02 [info     ] indicator_calculated           duration_ms=0.669 indicator=EMA20 rows=501 status=OK
+2026-07-23 21:26:02 [info     ] indicator_calculated           duration_ms=0.297 indicator=EMA50 rows=501 status=OK
+2026-07-23 21:26:02 [info     ] indicator_calculated           duration_ms=0.319 indicator=EMA200 rows=501 status=OK
+2026-07-23 21:26:02 [info     ] indicator_calculated           duration_ms=1.273 indicator=RSI(14) rows=501 status=OK
+2026-07-23 21:26:02 [info     ] indicator_calculated           duration_ms=1.025 indicator=ATR(14) rows=501 status=OK
+2026-07-23 21:26:02 [info     ] indicator_calculated           duration_ms=4.878 indicator=ADX(14) rows=501 status=OK
+2026-07-23 21:26:02 [info     ] market_data_validated          columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'] rows=501
+2026-07-23 21:26:02 [info     ] market_snapshots_built         count=501 symbol=SPY
+2026-07-23 21:26:02 [info     ] trend_analysis_completed       confidence=1.0 regime=bull score=7.5 symbol=SPY
+2026-07-23 21:26:02 [info     ] market_data_fetched            interval=1d period=5d provider=yahoo_finance rows=5 symbol=^VIX
+ Market Snapshot: SPY  
+┏━━━━━━━━━━━━┳━━━━━━━━┓
+┃ Indicator  ┃  Value ┃
+┡━━━━━━━━━━━━╇━━━━━━━━┩
+│ Last Price │ 738.18 │
+│ EMA20      │ 745.81 │
+│ EMA50      │ 738.91 │
+│ EMA200     │ 698.88 │
+│ RSI(14)    │  44.56 │
+│ ATR(14)    │   8.28 │
+│ ADX(14)    │  18.67 │
+└────────────┴────────┘
+Market Regime: Bull
+Trend Score: 7.5
+Confidence: 100%
+Trend Score: 7.5
+
+Reason:
+[PASS] Price is above EMA200.
+[PASS] EMA20 is above EMA50.
+[PASS] EMA50 is above EMA200.
+[FAIL] RSI is outside the healthy range.
+[FAIL] ADX does not indicate a strong trend.
+[PASS] ATR is expanding.
+[FAIL] Price is not making higher highs.
+[FAIL] Price is not making higher lows.
+Recommendation: Call Debit Spread
+Suggested expiry: 2026-08-25
+Report saved: reports/market/SPY_20260723T212602Z.txt
