@@ -81,7 +81,7 @@ def write_market_report(
 def _trade_lines(estimated_trade: EstimatedTrade | None) -> list[str]:
     if estimated_trade is None:
         return ["No Trade: a live VIX-based estimate is unavailable for this run."]
-    
+
     leg_lines = [
         f"{leg.action.title()} {leg.right.title():<4}: {leg.strike:,.2f}"
         for leg in estimated_trade.legs
