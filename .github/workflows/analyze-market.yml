@@ -1,0 +1,38 @@
+name: Analyze Market
+
+on:
+  schedule:
+    # GitHub Actions schedules use UTC. These correspond to 10:30, 13:30, and 15:20 IST.
+    - cron: "0 5 * * *"
+    - cron: "0 8 * * *"
+    - cron: "50 9 * * *"
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: Yahoo Finance symbol to analyze
+        required: false
+        default: ^NSEI
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-market:
+    runs-on: ubuntu-latest
+    env:
+      PIE_SYMBOL: ${{ inputs.symbol || '^NSEI' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Analyze market
+        run: uv run pie analyze-market "$PIE_SYMBOL"
