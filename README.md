@@ -1,10 +1,16 @@
 <!-- MARKET-SNAPSHOT-START -->
 | Market    | Updated   | Trend      | Strategy          | Signal | Since          |
 | --------- | --------- | ---------- | ----------------- | ------ | -------------- |
-| NIFTY 50  | 11:55 IST | 🔴 Bear     | Buy NIFTY 25-Aug-2026-23700-PE<br>Sell NIFTY 25-Aug-2026-22950-PE | Active | Today, 11:27   |
-| BANKNIFTY | 11:55 IST | 🟡 Neutral  | No Trade          | Hold   | Today, 11:27   |
+| NIFTY 50  | 13:27 IST | 🔴 Bear     | Buy NIFTY 25-Aug-2026-23800-PE<br>Sell NIFTY 25-Aug-2026-23050-PE | Active | Today, 11:27   |
+| BANKNIFTY | 13:27 IST | 🟢 Strong Bull | Buy BANKNIFTY 25-Aug-2026-56743-CE<br>Sell BANKNIFTY 25-Aug-2026-59125-CE | NEW    | Today, 13:27   |
 | SPY       | 12:31 IST | 🟢 Bull     | Buy SPY 25-Aug-2026-738-CE<br>Sell SPY 25-Aug-2026-769-CE | NEW    | Today, 12:31   |
 | QQQ       | 12:31 IST | 🟢 Bull     | Buy QQQ 25-Aug-2026-692-CE<br>Sell QQQ 25-Aug-2026-721-CE | NEW    | Today, 12:31   |
+| HDFCBANK.NS | 13:27 IST | 🔴 Strong Bear | Buy HDFCBANK.NS 25-Aug-2026-746-PE<br>Sell HDFCBANK.NS 25-Aug-2026-715-PE | NEW    | Today, 13:27   |
+| ICICIBANK.NS | 13:27 IST | 🟢 Strong Bull | Buy ICICIBANK.NS 25-Aug-2026-1440-CE<br>Sell ICICIBANK.NS 25-Aug-2026-1500-CE | NEW    | Today, 13:27   |
+| INFY.NS   | 13:27 IST | 🔴 Strong Bear | Buy INFY.NS 25-Aug-2026-1030-PE<br>Sell INFY.NS 25-Aug-2026-987-PE | NEW    | Today, 13:27   |
+| SBIN.NS   | 13:27 IST | 🟢 Strong Bull | Buy SBIN.NS 25-Aug-2026-1016-CE<br>Sell SBIN.NS 25-Aug-2026-1059-CE | NEW    | Today, 13:27   |
+| TCS.NS    | 13:27 IST | 🔴 Bear     | Buy TCS.NS 25-Aug-2026-2252-PE<br>Sell TCS.NS 25-Aug-2026-2157-PE | NEW    | Today, 13:27   |
+| WIPRO.NS  | 13:27 IST | 🔴 Strong Bear | Buy WIPRO.NS 25-Aug-2026-177-PE<br>Sell WIPRO.NS 25-Aug-2026-170-PE | NEW    | Today, 13:27   |
 <!-- MARKET-SNAPSHOT-END -->
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
