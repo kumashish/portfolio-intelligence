@@ -71,3 +71,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           event-type: update-readme
           client-payload: '{"source_workflow":"${{ github.workflow }}","ref":"${{ github.ref }}"}'
+
+      - name: Append to signal history
+        run: |
+          uv run python scripts/append_history.py "${SYMBOL}" "${TREND}" "${STRATEGY}" "${SIGNAL}"
