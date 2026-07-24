@@ -14,6 +14,11 @@ TARGET_DAYS_TO_EXPIRY = 37
 MINIMUM_DAYS_TO_EXPIRY = 30
 MAXIMUM_DAYS_TO_EXPIRY = 45
 
+STRIKE_INCREMENTS = {
+    "^NSEI": 50.0,
+    "^NSEBANK": 100.0,
+}
+
 
 class OptionRight(StrEnum):
     """The option right used by an estimated spread leg."""
@@ -124,12 +129,7 @@ def _last_tuesday(year: int, month: int) -> date:
 
 
 def _strike_increment(symbol: str) -> float:
-    if symbol == "^NSEI":
-        return 50.0
-    elif symbol == "^NSEBANK":
-        return 100.0
-    else:
-        return 1.0
+    return STRIKE_INCREMENTS.get(symbol, 1.0)
 
 
 def _round_to_increment(value: float, increment: float) -> float:
