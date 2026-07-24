@@ -1,339 +1,76 @@
-diff --git a/.github/workflows/analyze-market.yml b/.github/workflows/analyze-market.yml
-index 26b2e36..c71ec4d 100644
---- a/.github/workflows/analyze-market.yml
-+++ b/.github/workflows/analyze-market.yml
-@@ -6,10 +6,16 @@ concurrency:
- 
- on:
-   schedule:
--    # 10:30, 13:30 and 15:20 IST
--    - cron: "0 5 * * *"
--    - cron: "0 8 * * *"
--    - cron: "50 9 * * *"
-+    # Every hour, 10:20 AM to 3:20 PM IST, Monday-Friday only (NSE trading
-+    # session). These land at :50 past the hour in UTC, which naturally
-+    # avoids the top-of-the-hour minute GitHub Actions schedules are most
-+    # likely to be delayed or dropped under load.
-+    - cron: "50 4 * * 1-5"  # 10:20 IST
-+    - cron: "50 5 * * 1-5"  # 11:20 IST
-+    - cron: "50 6 * * 1-5"  # 12:20 IST
-+    - cron: "50 7 * * 1-5"  # 13:20 IST
-+    - cron: "50 8 * * 1-5"  # 14:20 IST
-+    - cron: "50 9 * * 1-5"  # 15:20 IST
- 
-   workflow_dispatch:
-     inputs:
-@@ -51,27 +57,20 @@ jobs:
-             uv run pie analyze-market "$SYMBOL"
-           done
- 
--      - name: Commit market reports
-+      - name: Update README snapshot
-+        run: uv run pie readme update-readme-snapshot
-+
-+      - name: Commit and push market reports
-         run: |
-           git config user.name "github-actions[bot]"
-           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
- 
--          git add reports/market/
-+          git add reports/market/ state/ README.md
- 
-           if git diff --cached --quiet; then
-             echo "No report changes."
-             exit 0
-           fi
- 
--          git commit -m "chore: update market reports"
--
--      - name: Trigger README update
--        uses: peter-evans/repository-dispatch@v2
--        with:
--          token: ${{ secrets.GITHUB_TOKEN }}
--          event-type: update-readme
--          client-payload: '{"source_workflow":"${{ github.workflow }}","ref":"${{ github.ref }}"}'
--
--      - name: Append to signal history
--        run: |
--          uv run python scripts/append_history.py "${SYMBOL}" "${TREND}" "${STRATEGY}" "${SIGNAL}"
-+          git commit -m "chore: update market reports and README snapshot"
-+          git push
-diff --git a/.github/workflows/analyze-us-market.yml b/.github/workflows/analyze-us-market.yml
-index 5770df9..7975457 100644
---- a/.github/workflows/analyze-us-market.yml
-+++ b/.github/workflows/analyze-us-market.yml
-@@ -6,8 +6,10 @@ concurrency:
- 
- on:
-   schedule:
--    # 19:00 IST
--    - cron: "30 13 * * *"
-+    # 19:00 IST — offset a few minutes off the top of the hour, since GitHub
-+    # Actions schedules are most likely to be delayed or dropped under load
-+    # exactly at :00/:30.
-+    - cron: "34 13 * * *"
-   workflow_dispatch:
- 
- permissions:
-@@ -29,42 +31,27 @@ jobs:
-       - name: Install dependencies
-         run: uv sync --locked
- 
--      - name: Generate market reports
-+      - name: Analyze market
-         run: |
--          mkdir -p reports/market
-+          for SYMBOL in SPY QQQ; do
-+            echo "Analyzing ${SYMBOL}"
-+            uv run pie analyze-market "$SYMBOL"
-+          done
- 
--          uv run pie analyze-market SPY > reports/market/SPY.txt
--          uv run pie analyze-market QQQ > reports/market/QQQ.txt
-+      - name: Update README snapshot
-+        run: uv run pie readme update-readme-snapshot
- 
--      - name: Debug generated files
--        run: |
--          echo "Generated files:"
--          find reports -type f -print
--
--          echo
--          echo "Contents:"
--          ls -R reports
--
--      - name: Verify reports exist
--        run: |
--          test -f reports/market/SPY.txt
--          test -f reports/market/QQQ.txt
--
--      - name: Commit market reports
-+      - name: Commit and push market reports
-         run: |
-           git config user.name "github-actions[bot]"
-           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
- 
--          git add reports/market/
-+          git add reports/market/ state/ README.md
- 
-           if git diff --cached --quiet; then
-             echo "No report changes."
-             exit 0
-           fi
- 
--      - name: Append to signal history
--        run: |
--          uv run python scripts/append_history.py "${SYMBOL}" "${TREND}" "${STRATEGY}" "${SIGNAL}"
--
--          git commit -m "chore: store US market reports"
-+          git commit -m "chore: store US market reports and README snapshot"
-           git push
-diff --git a/pie/cli/app.py b/pie/cli/app.py
-index 462fe1e..59a959e 100644
---- a/pie/cli/app.py
-+++ b/pie/cli/app.py
-@@ -1,5 +1,6 @@
- """Typer command-line interface."""
- 
-+from datetime import UTC, datetime
- from decimal import Decimal
- from pathlib import Path
- from typing import Annotated
-@@ -8,8 +9,10 @@ import typer
- from rich.console import Console
- from rich.table import Table
- 
-+from pie.cli.readme import readme_app
- from pie.config.loader import load_config
- from pie.config.models import TrendWeights
-+from pie.core.signal_state import SignalStateManager
- from pie.market.backtest.engine import TrendBacktester
- from pie.market.indicators.engine import IndicatorEngine
- from pie.market.strategy import StrategyRecommendation, select_strategy
-@@ -20,10 +23,22 @@ from pie.market_data.exceptions import MarketDataError
- from pie.market_data.snapshots import SnapshotBuilder
- from pie.providers.yahoo import UrllibHTTPClient, YahooFinanceProvider
- from pie.reporting.market import write_market_report
-+from pie.reporting.snapshot import upsert_snapshot_entry
- 
- app = typer.Typer(help="Portfolio Intelligence Engine.", no_args_is_help=True)
-+app.add_typer(readme_app, name="readme")
- console = Console()
- 
-+MARKET_NAMES = {"^NSEI": "NIFTY 50", "^NSEBANK": "BANKNIFTY", "SPY": "SPY", "QQQ": "QQQ"}
-+REGIME_LABELS = {
-+    "strong_bull": "🟢 Strong Bull",
-+    "bull": "🟢 Bull",
-+    "neutral": "🟡 Neutral",
-+    "bear": "🔴 Bear",
-+    "strong_bear": "🔴 Strong Bear",
-+    "unknown": "⚪ Unknown",
-+}
-+
- VIX_SYMBOLS = {"^NSEI": "^INDIAVIX", "SPY": "^VIX", "QQQ": "^VIX"}
- FALLBACK_VIX = {"^NSEI": 15.0, "SPY": 20.0, "QQQ": 20.0}
- 
-@@ -71,6 +86,30 @@ def analyze_market(
-         recommendation,
-         estimated_trade,
-     )
-+    generated_at = datetime.now(UTC)
-+    state, status = SignalStateManager().update_state(
-+        symbol=symbol,
-+        strategy=recommendation.strategy.value,
-+        regime=trend.regime.value,
-+    )
-+    if not recommendation.actionable:
-+        signal_label = "Hold"
-+    elif status in {"NEW", "CHANGED"}:
-+        signal_label = "NEW"
-+    else:
-+        signal_label = "Active"
-+    upsert_snapshot_entry(
-+        Path("reports/market/snapshot.json"),
-+        {
-+            "symbol": symbol,
-+            "market": MARKET_NAMES.get(symbol, symbol),
-+            "last_updated": generated_at.isoformat(),
-+            "trend": REGIME_LABELS.get(trend.regime.value, trend.regime.value),
-+            "strategy": recommendation.strategy.replace("_", " ").title(),
-+            "signal": signal_label,
-+            "signal_since": state.trend_started_at.isoformat(),
-+        },
-+    )
-     table = Table(title=f"Market Snapshot: {symbol}")
-     table.add_column("Indicator")
-     table.add_column("Value", justify="right")
-diff --git a/pie/cli/readme.py b/pie/cli/readme.py
-index a643921..12b87bd 100644
---- a/pie/cli/readme.py
-+++ b/pie/cli/readme.py
-@@ -1,79 +1,21 @@
--"""CLI commands for generating and updating README market snapshot."""
-+"""CLI commands for updating the README market snapshot.
-+
-+reports/market/snapshot.json is maintained incrementally: every
-+`pie analyze-market <SYMBOL>` run upserts its own row into that file
-+(see pie.reporting.snapshot.upsert_snapshot_entry). This module just
-+renders that file into the README table.
-+"""
- 
--from datetime import UTC, datetime
- from pathlib import Path
- from typing import Annotated
- 
- import typer
- 
--from pie.reporting.readme_update import (
--    generate_readme_snapshot,
--    load_market_data_from_json,
--    update_readme_snapshot,
--)
-+from pie.reporting.readme_update import load_market_data_from_json, update_readme_snapshot
- 
- readme_app = typer.Typer(help="README update commands.", no_args_is_help=True)
- 
- 
--@readme_app.command("generate-snapshot-metadata")
--def generate_snapshot_metadata(
--    output: Annotated[Path, typer.Option(help="Output JSON file path.")] = Path(
--        "reports/market/snapshot.json"
--    ),
--    symbols: Annotated[
--        list[str], typer.Option(help="Market symbols to include (repeatable).")
--    ] = ["^NSEI", "^NSEBANK", "SPY", "QQQ"],
--) -> None:
--    """Generate market snapshot metadata from latest report files.
--
--    Scans reports/market/ directory for the most recent analysis files
--    and generates a JSON metadata file with IST-formatted timestamps.
--    """
--    import json
--    from glob import glob
--
--    # Map symbols to market names
--    symbol_names = {
--        "^NSEI": "NIFTY 50",
--        "^NSEBANK": "BANKNIFTY",
--        "SPY": "SPY",
--        "QQQ": "QQQ",
--    }
--
--    # Placeholder implementation - in production, would parse actual report files
--    market_data = []
--    now = datetime.now(UTC)
--
--    for symbol in symbols:
--        market_data.append(
--            {
--                "symbol": symbol,
--                "market": symbol_names.get(symbol, symbol),
--                "last_updated": now.isoformat(),
--                "trend": "🟢 Bull",  # Would be parsed from report
--                "strategy": "Call Debit Spread",  # Would be parsed from report
--                "signal": "NEW",  # Would be parsed from report
--                "signal_since": now.isoformat(),  # Would be parsed from report
--            }
--        )
--
--    # In a real scenario, you'd read from actual report files:
--    # reports_dir = Path("reports/market")
--    # for symbol in symbols:
--    #     latest_report = max(
--    #         glob(str(reports_dir / f"{symbol}_*.txt")),
--    #         key=lambda x: Path(x).stat().st_mtime,
--    #         default=None
--    #     )
--    #     if latest_report:
--    #         # Parse the report file and extract metadata
--    #         ...
--
--    output.parent.mkdir(parents=True, exist_ok=True)
--    output.write_text(json.dumps(market_data, indent=2), encoding="utf-8")
--    typer.echo(f"Generated snapshot metadata: {output}")
--
--
- @readme_app.command("update-readme-snapshot")
- def update_readme_snapshot_cmd(
-     snapshot_file: Annotated[
-diff --git a/pie/reporting/snapshot.py b/pie/reporting/snapshot.py
-new file mode 100644
-index 0000000..2817758
---- /dev/null
-+++ b/pie/reporting/snapshot.py
-@@ -0,0 +1,35 @@
-+"""Maintain a single combined market snapshot JSON used to render the README table."""
-+
-+import json
-+from pathlib import Path
-+
-+CANONICAL_SYMBOL_ORDER = ["^NSEI", "^NSEBANK", "SPY", "QQQ"]
-+
-+
-+def _sort_key(entry: dict[str, str]) -> tuple[int, str]:
-+    symbol = entry.get("symbol", "")
-+    try:
-+        return CANONICAL_SYMBOL_ORDER.index(symbol), symbol
-+    except ValueError:
-+        return len(CANONICAL_SYMBOL_ORDER), symbol
-+
-+
-+def upsert_snapshot_entry(snapshot_path: Path, entry: dict[str, str]) -> list[dict[str, str]]:
-+    """Insert or replace the row for entry['symbol'] in the snapshot JSON file.
-+
-+    Returns the full, sorted list of entries after the update.
-+    """
-+    existing: list[dict[str, str]] = []
-+    if snapshot_path.exists():
-+        try:
-+            existing = json.loads(snapshot_path.read_text(encoding="utf-8"))
-+        except (json.JSONDecodeError, ValueError):
-+            existing = []
-+
-+    existing = [row for row in existing if row.get("symbol") != entry["symbol"]]
-+    existing.append(entry)
-+    existing.sort(key=_sort_key)
-+
-+    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
-+    snapshot_path.write_text(json.dumps(existing, indent=2), encoding="utf-8")
-+    return existing
+name: Analyze Market
+
+concurrency:
+  group: market-analysis
+  cancel-in-progress: false
+
+on:
+  schedule:
+    # Every hour, 10:20 AM to 3:20 PM IST, Monday-Friday only (NSE trading
+    # session). These land at :50 past the hour in UTC, which naturally
+    # avoids the top-of-the-hour minute GitHub Actions schedules are most
+    # likely to be delayed or dropped under load.
+    - cron: "50 4 * * 1-5"  # 10:20 IST
+    - cron: "50 5 * * 1-5"  # 11:20 IST
+    - cron: "50 6 * * 1-5"  # 12:20 IST
+    - cron: "50 7 * * 1-5"  # 13:20 IST
+    - cron: "50 8 * * 1-5"  # 14:20 IST
+    - cron: "50 9 * * 1-5"  # 15:20 IST
+
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: Yahoo Finance symbol (leave blank to run default symbols)
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  analyze-market:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Analyze market
+        run: |
+          if [ -n "${{ inputs.symbol }}" ]; then
+            SYMBOLS="${{ inputs.symbol }}"
+          else
+            SYMBOLS="^NSEI ^NSEBANK"
+          fi
+
+          for SYMBOL in $SYMBOLS; do
+            echo "Analyzing ${SYMBOL}"
+            uv run pie analyze-market "$SYMBOL"
+          done
+
+      - name: Update README snapshot
+        run: uv run pie readme update-readme-snapshot
+
+      - name: Commit and push market reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add reports/market/ state/ README.md
+
+          if git diff --cached --quiet; then
+            echo "No report changes."
+            exit 0
+          fi
+
+          git commit -m "chore: update market reports and README snapshot"
+          git push
