@@ -20,19 +20,19 @@
   {
     "symbol": "SPY",
     "market": "SPY",
-    "last_updated": "2026-07-24T07:01:56.803835+00:00",
+    "last_updated": "2026-07-24T09:02:46.150338+00:00",
     "trend": "\ud83d\udfe2 Bull",
     "strategy": "Buy SPY 25-Aug-2026-738-CE<br>Sell SPY 25-Aug-2026-769-CE",
-    "signal": "NEW",
+    "signal": "Active",
     "signal_since": "2026-07-24T07:01:56.803927+00:00"
   },
   {
     "symbol": "QQQ",
     "market": "QQQ",
-    "last_updated": "2026-07-24T07:01:57.436159+00:00",
+    "last_updated": "2026-07-24T09:02:47.048578+00:00",
     "trend": "\ud83d\udfe2 Bull",
     "strategy": "Buy QQQ 25-Aug-2026-692-CE<br>Sell QQQ 25-Aug-2026-721-CE",
-    "signal": "NEW",
+    "signal": "Active",
     "signal_since": "2026-07-24T07:01:57.436230+00:00"
   },
   {

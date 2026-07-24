@@ -3,8 +3,8 @@
 | --------- | --------- | ---------- | ----------------- | ------ | -------------- |
 | NIFTY 50  | 13:42 IST | 🔴 Bear     | Buy NIFTY 25-Aug-2026-23750-PE<br>Sell NIFTY 25-Aug-2026-23000-PE | Active | Today, 11:27   |
 | BANKNIFTY | 13:42 IST | 🟢 Bull     | Buy BANKNIFTY 25-Aug-2026-56600-CE<br>Sell BANKNIFTY 25-Aug-2026-59000-CE | NEW    | Today, 13:42   |
-| SPY       | 12:31 IST | 🟢 Bull     | Buy SPY 25-Aug-2026-738-CE<br>Sell SPY 25-Aug-2026-769-CE | NEW    | Today, 12:31   |
-| QQQ       | 12:31 IST | 🟢 Bull     | Buy QQQ 25-Aug-2026-692-CE<br>Sell QQQ 25-Aug-2026-721-CE | NEW    | Today, 12:31   |
+| SPY       | 14:32 IST | 🟢 Bull     | Buy SPY 25-Aug-2026-738-CE<br>Sell SPY 25-Aug-2026-769-CE | Active | Today, 12:31   |
+| QQQ       | 14:32 IST | 🟢 Bull     | Buy QQQ 25-Aug-2026-692-CE<br>Sell QQQ 25-Aug-2026-721-CE | Active | Today, 12:31   |
 | HDFCBANK.NS | 13:42 IST | 🔴 Strong Bear | Buy HDFCBANK.NS 25-Aug-2026-746-PE<br>Sell HDFCBANK.NS 25-Aug-2026-715-PE | Active | Today, 13:27   |
 | ICICIBANK.NS | 13:42 IST | 🟢 Strong Bull | Buy ICICIBANK.NS 25-Aug-2026-1434-CE<br>Sell ICICIBANK.NS 25-Aug-2026-1494-CE | Active | Today, 13:27   |
 | INFY.NS   | 13:42 IST | 🔴 Strong Bear | Buy INFY.NS 25-Aug-2026-1026-PE<br>Sell INFY.NS 25-Aug-2026-983-PE | Active | Today, 13:27   |
