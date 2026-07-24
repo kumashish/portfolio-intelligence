@@ -62,5 +62,9 @@ jobs:
             exit 0
           fi
 
+      - name: Append to signal history
+        run: |
+          uv run python scripts/append_history.py "${SYMBOL}" "${TREND}" "${STRATEGY}" "${SIGNAL}"
+
           git commit -m "chore: store US market reports"
           git push
