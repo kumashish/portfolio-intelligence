@@ -3,6 +3,8 @@
 | --------- | --------- | ---------- | ----------------- | ------ | -------------- |
 | NIFTY 50  | 11:55 IST | 🔴 Bear     | Buy NIFTY 25-Aug-2026-23700-PE<br>Sell NIFTY 25-Aug-2026-22950-PE | Active | Today, 11:27   |
 | BANKNIFTY | 11:55 IST | 🟡 Neutral  | No Trade          | Hold   | Today, 11:27   |
+| SPY       | 12:31 IST | 🟢 Bull     | Buy SPY 25-Aug-2026-738-CE<br>Sell SPY 25-Aug-2026-769-CE | NEW    | Today, 12:31   |
+| QQQ       | 12:31 IST | 🟢 Bull     | Buy QQQ 25-Aug-2026-692-CE<br>Sell QQQ 25-Aug-2026-721-CE | NEW    | Today, 12:31   |
 <!-- MARKET-SNAPSHOT-END -->
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
