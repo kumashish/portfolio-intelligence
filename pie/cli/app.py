@@ -1,5 +1,6 @@
 """Typer command-line interface."""
 
+from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Annotated
@@ -8,8 +9,10 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from pie.cli.readme import readme_app
 from pie.config.loader import load_config
 from pie.config.models import TrendWeights
+from pie.core.signal_state import SignalStateManager
 from pie.market.backtest.engine import TrendBacktester
 from pie.market.indicators.engine import IndicatorEngine
 from pie.market.strategy import StrategyRecommendation, select_strategy
@@ -20,9 +23,21 @@ from pie.market_data.exceptions import MarketDataError
 from pie.market_data.snapshots import SnapshotBuilder
 from pie.providers.yahoo import UrllibHTTPClient, YahooFinanceProvider
 from pie.reporting.market import write_market_report
+from pie.reporting.snapshot import upsert_snapshot_entry
 
 app = typer.Typer(help="Portfolio Intelligence Engine.", no_args_is_help=True)
+app.add_typer(readme_app, name="readme")
 console = Console()
+
+MARKET_NAMES = {"^NSEI": "NIFTY 50", "^NSEBANK": "BANKNIFTY", "SPY": "SPY", "QQQ": "QQQ"}
+REGIME_LABELS = {
+    "strong_bull": "🟢 Strong Bull",
+    "bull": "🟢 Bull",
+    "neutral": "🟡 Neutral",
+    "bear": "🔴 Bear",
+    "strong_bear": "🔴 Strong Bear",
+    "unknown": "⚪ Unknown",
+}
 
 VIX_SYMBOLS = {"^NSEI": "^INDIAVIX", "SPY": "^VIX", "QQQ": "^VIX"}
 FALLBACK_VIX = {"^NSEI": 15.0, "SPY": 20.0, "QQQ": 20.0}
@@ -70,6 +85,30 @@ def analyze_market(
         trend,
         recommendation,
         estimated_trade,
+    )
+    generated_at = datetime.now(UTC)
+    state, status = SignalStateManager().update_state(
+        symbol=symbol,
+        strategy=recommendation.strategy.value,
+        regime=trend.regime.value,
+    )
+    if not recommendation.actionable:
+        signal_label = "Hold"
+    elif status in {"NEW", "CHANGED"}:
+        signal_label = "NEW"
+    else:
+        signal_label = "Active"
+    upsert_snapshot_entry(
+        Path("reports/market/snapshot.json"),
+        {
+            "symbol": symbol,
+            "market": MARKET_NAMES.get(symbol, symbol),
+            "last_updated": generated_at.isoformat(),
+            "trend": REGIME_LABELS.get(trend.regime.value, trend.regime.value),
+            "strategy": recommendation.strategy.replace("_", " ").title(),
+            "signal": signal_label,
+            "signal_since": state.trend_started_at.isoformat(),
+        },
     )
     table = Table(title=f"Market Snapshot: {symbol}")
     table.add_column("Indicator")
