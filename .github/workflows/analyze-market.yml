@@ -1,77 +1,64 @@
-name: Analyze Market
+- name: Analyze market
+  shell: bash
+  run: |
+    set -euo pipefail
 
-concurrency:
-  group: market-analysis
-  cancel-in-progress: false
+    FAILED=0
 
-on:
-  schedule:
-    # Every hour, 10:20 AM to 3:20 PM IST, Monday-Friday only (NSE trading
-    # session). These land at :50 past the hour in UTC, which naturally
-    # avoids the top-of-the-hour minute GitHub Actions schedules are most
-    # likely to be delayed or dropped under load.
-    - cron: "50 4 * * 1-5"  # 10:20 IST
-    - cron: "50 5 * * 1-5"  # 11:20 IST
-    - cron: "50 6 * * 1-5"  # 12:20 IST
-    - cron: "50 7 * * 1-5"  # 13:20 IST
-    - cron: "50 8 * * 1-5"  # 14:20 IST
-    - cron: "50 9 * * 1-5"  # 15:20 IST
+    analyze_symbol() {
+      local SYMBOL="$1"
 
-  workflow_dispatch:
-    inputs:
-      symbol:
-        description: Yahoo Finance symbol (leave blank to run default symbols)
-        required: false
-        default: ""
-        type: string
+      echo "::group::${SYMBOL}"
 
-permissions:
-  contents: write
+      SUCCESS=0
 
-jobs:
-  analyze-market:
-    runs-on: ubuntu-latest
+      for ATTEMPT in 1 2 3; do
+        echo "Attempt ${ATTEMPT}/3"
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+        if uv run pie analyze-market "${SYMBOL}"; then
+          SUCCESS=1
+          break
+        fi
 
-      - name: Set up uv and Python
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: "3.12"
+        if [ "$ATTEMPT" -lt 3 ]; then
+          echo "Retrying in 15 seconds..."
+          sleep 15
+        fi
+      done
 
-      - name: Install dependencies
-        run: uv sync --locked
+      if [ "$SUCCESS" -eq 0 ]; then
+        echo "::error::Failed to analyze ${SYMBOL}"
+        FAILED=1
+      fi
 
-      - name: Analyze market
-        run: |
-          if [ -n "${{ inputs.symbol }}" ]; then
-            SYMBOLS="${{ inputs.symbol }}"
-          else
-            SYMBOLS="^NSEI ^NSEBANK"
-          fi
+      echo "::endgroup::"
+    }
 
-          for SYMBOL in $SYMBOLS; do
-            echo "Analyzing ${SYMBOL}"
-            uv run pie analyze-market "$SYMBOL"
-          done
+    if [ -n "${{ inputs.symbol }}" ]; then
+      echo "Running analysis for manually supplied symbol..."
+      analyze_symbol "${{ inputs.symbol }}"
 
-      - name: Update README snapshot
-        run: uv run pie readme update-readme-snapshot
+    elif [ -f config/market_symbols.txt ]; then
+      echo "Using symbols from config/market_symbols.txt"
 
-      - name: Commit and push market reports
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      while IFS= read -r SYMBOL || [ -n "$SYMBOL" ]; do
+        # Trim whitespace
+        SYMBOL="$(echo "$SYMBOL" | xargs)"
 
-          git add reports/market/ state/ README.md
+        # Ignore blank lines and comments
+        [[ -z "$SYMBOL" ]] && continue
+        [[ "$SYMBOL" =~ ^# ]] && continue
 
-          if git diff --cached --quiet; then
-            echo "No report changes."
-            exit 0
-          fi
+        analyze_symbol "$SYMBOL"
 
-          git commit -m "chore: update market reports and README snapshot"
-          git pull --rebase origin main
-          git push
+      done < config/market_symbols.txt
+
+    else
+      echo "No config/market_symbols.txt found."
+      echo "Using default symbols: ^NSEI ^NSEBANK"
+
+      analyze_symbol "^NSEI"
+      analyze_symbol "^NSEBANK"
+    fi
+
+    exit $FAILED
