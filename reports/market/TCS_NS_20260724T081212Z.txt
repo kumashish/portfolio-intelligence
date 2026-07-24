@@ -1,0 +1,65 @@
+PORTFOLIO INTELLIGENCE ENGINE
+================================
+
+Generated At : 2026-07-24 08:12:12 UTC
+Symbol       : TCS.NS
+Last Price   : 2,244.00
+
+TRADE RECOMMENDATION
+====================
+Strategy     : Put Debit Spread
+Actionable   : ✅ Yes
+
+SUGGESTED TRADE
+===============
+Expiry       : 2026-08-25
+Expected Move: 125.38
+VIX          : 18.87
+VIX Source   : live ^VIX
+Buy Put : 2,244.00
+Sell Put : 2,150.00
+
+Exit Strategy:
+- Exit if the trend regime becomes Neutral, Bull, or Strong Bull.
+- Exit if spot closes above EMA50.
+- Reassess or close at 21 days to expiry.
+
+Estimated from spot and annualized VIX only; premiums, liquidity, and execution are not included.
+
+Rationale
+---------
+Confirmed bearish trend supports a directional put debit spread.
+
+Limitations
+-----------
+- Validate estimated strikes and expiry against live option-chain liquidity and pricing.
+- This is an advisory signal, not an execution instruction.
+
+MARKET INTELLIGENCE
+-------------------
+Regime       : Bear
+Trend Score  : 2.0 / 10
+Confidence   : 100%
+
+INDICATORS
+----------
+EMA20       : 2,180.21
+EMA50       : 2,215.84
+EMA200      : 2,621.29
+RSI(14)     : 58.15
+ATR(14)     : 58.15
+ADX(14)     : 17.70
+
+TREND EXPLANATION
+-----------------
+Trend Score: 2.0
+
+Reason:
+[FAIL] Price is below EMA200.
+[FAIL] EMA20 is not above EMA50.
+[FAIL] EMA50 is not above EMA200.
+[PASS] RSI is healthy.
+[FAIL] ADX does not indicate a strong trend.
+[PASS] ATR is expanding.
+[PASS] Price is making higher highs.
+[PASS] Price is making higher lows.
