@@ -6,7 +6,7 @@ concurrency:
 
 on:
   schedule:
-    # Every hour, 10:20 AM to 3:20 PM IST (Mon-Fri)
+    # Every hour from 10:20 AM to 3:20 PM IST (Mon-Fri)
     - cron: "50 4-9 * * 1-5"
 
   workflow_dispatch:
@@ -94,7 +94,7 @@ jobs:
             fi
           done
 
-          FAILED_SYMBOLS="$(echo "$FAILED_SYMBOLS" | xargs)"
+          FAILED_SYMBOLS="$(echo "$FAILED_SYMBOLS" | xargs || true)"
 
           if [ -n "$FAILED_SYMBOLS" ]; then
             echo "FAILED_SYMBOLS=$FAILED_SYMBOLS" >> "$GITHUB_ENV"
