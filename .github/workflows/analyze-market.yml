@@ -111,15 +111,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add "reports/market-state" README.md
+          # Ensure we have the latest remote branch and rebase our working branch first
+          git fetch origin
+          git rebase origin/main
+
+          # Now stage updated reports and README. Quote any paths with spaces.
+          git add "reports/market state" README.md
 
           if git diff --cached --quiet; then
             echo "No report changes."
             exit 0
           fi
-
-          git fetch origin
-          git rebase origin/main
 
           git commit -m "chore: update market reports and README snapshot"
 
