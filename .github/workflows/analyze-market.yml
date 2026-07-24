@@ -1,4 +1,4 @@
-- name: Analyze market
+name: Analyze market
   shell: bash
   run: |
     set -euo pipefail
@@ -10,7 +10,7 @@
 
       echo "::group::${SYMBOL}"
 
-      SUCCESS=0
+      local SUCCESS=0
 
       for ATTEMPT in 1 2 3; do
         echo "Attempt ${ATTEMPT}/3"
@@ -36,29 +36,22 @@
 
     if [ -n "${{ inputs.symbol }}" ]; then
       echo "Running analysis for manually supplied symbol..."
-      analyze_symbol "${{ inputs.symbol }}"
+      SYMBOLS="${{ inputs.symbol }}"
 
     elif [ -f config/market_symbols.txt ]; then
       echo "Using symbols from config/market_symbols.txt"
 
-      while IFS= read -r SYMBOL || [ -n "$SYMBOL" ]; do
-        # Trim whitespace
-        SYMBOL="$(echo "$SYMBOL" | xargs)"
-
-        # Ignore blank lines and comments
-        [[ -z "$SYMBOL" ]] && continue
-        [[ "$SYMBOL" =~ ^# ]] && continue
-
-        analyze_symbol "$SYMBOL"
-
-      done < config/market_symbols.txt
+      SYMBOLS=$(grep -vE '^[[:space:]]*#|^[[:space:]]*$' config/market_symbols.txt)
 
     else
       echo "No config/market_symbols.txt found."
       echo "Using default symbols: ^NSEI ^NSEBANK"
 
-      analyze_symbol "^NSEI"
-      analyze_symbol "^NSEBANK"
+      SYMBOLS="^NSEI ^NSEBANK"
     fi
+
+    for SYMBOL in $SYMBOLS; do
+      analyze_symbol "$SYMBOL"
+    done
 
     exit $FAILED
