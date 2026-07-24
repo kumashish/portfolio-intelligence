@@ -1,10 +1,8 @@
 <!-- MARKET-SNAPSHOT-START -->
-| Market    | Updated   | Trend      | Strategy          | Signal | Since  |
-| --------- | --------- | ---------- | ----------------- | ------ | ------ |
-| NIFTY 50  | 15:20 IST | 🟢 Bull    | Call Debit Spread | NEW    | Today  |
-| BANKNIFTY | 15:20 IST | 🟢 Bull    | Put Credit Spread | Active | 3 days |
-| SPY       | 21:35 UTC | 🟡 Neutral | Iron Condor       | Hold   | 5 days |
-| QQQ       | 21:35 UTC | 🔴 Bear    | Put Debit Spread  | NEW    | Today  |
+| Market    | Updated   | Trend      | Strategy          | Signal | Since          |
+| --------- | --------- | ---------- | ----------------- | ------ | -------------- |
+| NIFTY 50  | 11:27 IST | 🔴 Bear     | Put Debit Spread  | NEW    | Today, 11:27   |
+| BANKNIFTY | 11:27 IST | 🟡 Neutral  | No Trade          | Hold   | Today, 11:27   |
 <!-- MARKET-SNAPSHOT-END -->
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)

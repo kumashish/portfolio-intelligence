@@ -1,0 +1,48 @@
+PORTFOLIO INTELLIGENCE ENGINE
+================================
+
+Generated At : 2026-07-24 05:57:47 UTC
+Symbol       : ^NSEBANK
+Last Price   : 56,212.10
+
+TRADE RECOMMENDATION
+====================
+Strategy     : No Trade
+Actionable   : ❌ No
+
+SUGGESTED TRADE
+===============
+No Trade: a live VIX-based estimate is unavailable for this run.
+
+Rationale
+---------
+Neutral or unknown market regime does not justify a directional trade.
+
+MARKET INTELLIGENCE
+-------------------
+Regime       : Neutral
+Trend Score  : 4.5 / 10
+Confidence   : 100%
+
+INDICATORS
+----------
+EMA20       : 57,348.85
+EMA50       : 56,811.49
+EMA200      : 56,511.64
+RSI(14)     : 41.62
+ATR(14)     : 757.81
+ADX(14)     : 13.99
+
+TREND EXPLANATION
+-----------------
+Trend Score: 4.5
+
+Reason:
+[FAIL] Price is below EMA200.
+[PASS] EMA20 is above EMA50.
+[PASS] EMA50 is above EMA200.
+[FAIL] RSI is outside the healthy range.
+[FAIL] ADX does not indicate a strong trend.
+[PASS] ATR is expanding.
+[FAIL] Price is not making higher highs.
+[FAIL] Price is not making higher lows.
