@@ -8,7 +8,7 @@
 <!-- MARKET-SNAPSHOT-END -->
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
-![Python](https://img.shields.io/badge/python-3.10-blue)
+![Python](https://img.shields.io/badge/python-3.12-blue)
 # Portfolio Intelligence
 
 A personal market and options decision engine for systematic premium selling, directional overlays, and adaptive learning.
