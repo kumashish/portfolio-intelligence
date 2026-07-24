@@ -1,57 +1,132 @@
-name: Analyze market
-  shell: bash
-  run: |
-    set -euo pipefail
+name: Analyze Market
 
-    FAILED=0
+concurrency:
+  group: market-analysis
+  cancel-in-progress: false
 
-    analyze_symbol() {
-      local SYMBOL="$1"
+on:
+  schedule:
+    # Every hour, 10:20 AM to 3:20 PM IST (Mon-Fri)
+    - cron: "50 4-9 * * 1-5"
 
-      echo "::group::${SYMBOL}"
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: Yahoo Finance symbol (leave blank to use configured symbols)
+        required: false
+        default: ""
+        type: string
 
-      local SUCCESS=0
+permissions:
+  contents: write
 
-      for ATTEMPT in 1 2 3; do
-        echo "Attempt ${ATTEMPT}/3"
+jobs:
+  analyze-market:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
-        if uv run pie analyze-market "${SYMBOL}"; then
-          SUCCESS=1
-          break
-        fi
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        if [ "$ATTEMPT" -lt 3 ]; then
-          echo "Retrying in 15 seconds..."
-          sleep 15
-        fi
-      done
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+          enable-cache: true
 
-      if [ "$SUCCESS" -eq 0 ]; then
-        echo "::error::Failed to analyze ${SYMBOL}"
-        FAILED=1
-      fi
+      - name: Install dependencies
+        run: uv sync --locked
 
-      echo "::endgroup::"
-    }
+      - name: Analyze market
+        shell: bash
+        run: |
+          set -euo pipefail
 
-    if [ -n "${{ inputs.symbol }}" ]; then
-      echo "Running analysis for manually supplied symbol..."
-      SYMBOLS="${{ inputs.symbol }}"
+          analyze_symbol() {
+            local SYMBOL="$1"
 
-    elif [ -f config/market_symbols.txt ]; then
-      echo "Using symbols from config/market_symbols.txt"
+            echo "::group::${SYMBOL}"
 
-      SYMBOLS=$(grep -vE '^[[:space:]]*#|^[[:space:]]*$' config/market_symbols.txt)
+            for ATTEMPT in 1 2 3; do
+              echo "Attempt ${ATTEMPT}/3"
 
-    else
-      echo "No config/market_symbols.txt found."
-      echo "Using default symbols: ^NSEI ^NSEBANK"
+              if uv run pie analyze-market "${SYMBOL}"; then
+                echo "::endgroup::"
+                return 0
+              fi
 
-      SYMBOLS="^NSEI ^NSEBANK"
-    fi
+              if [ "$ATTEMPT" -lt 3 ]; then
+                echo "Retrying in 15 seconds..."
+                sleep 15
+              fi
+            done
 
-    for SYMBOL in $SYMBOLS; do
-      analyze_symbol "$SYMBOL"
-    done
+            echo "::error::Failed to analyze ${SYMBOL}"
+            echo "::endgroup::"
 
-    exit $FAILED
+            return 1
+          }
+
+          if [ -n "${{ inputs.symbol }}" ]; then
+            echo "Running analysis for manually supplied symbol..."
+            SYMBOLS="${{ inputs.symbol }}"
+
+          elif [ -f config/market_symbols.txt ]; then
+            echo "Using symbols from config/market_symbols.txt"
+
+            SYMBOLS=$(grep -vE '^[[:space:]]*#|^[[:space:]]*$' config/market_symbols.txt)
+
+          else
+            echo "No config/market_symbols.txt found."
+            echo "Using default symbols: ^NSEI ^NSEBANK"
+
+            SYMBOLS="^NSEI ^NSEBANK"
+          fi
+
+          FAILED_SYMBOLS=""
+
+          for SYMBOL in $SYMBOLS; do
+            if ! analyze_symbol "$SYMBOL"; then
+              FAILED_SYMBOLS="${FAILED_SYMBOLS} ${SYMBOL}"
+            fi
+          done
+
+          FAILED_SYMBOLS="$(echo "$FAILED_SYMBOLS" | xargs)"
+
+          if [ -n "$FAILED_SYMBOLS" ]; then
+            echo "FAILED_SYMBOLS=$FAILED_SYMBOLS" >> "$GITHUB_ENV"
+          fi
+
+      - name: Update README snapshot
+        run: uv run pie readme update-readme-snapshot
+
+      - name: Commit and push market reports
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add reports/market state README.md
+
+          if git diff --cached --quiet; then
+            echo "No report changes."
+            exit 0
+          fi
+
+          git fetch origin
+          git rebase origin/main
+
+          git commit -m "chore: update market reports and README snapshot"
+
+          git push origin HEAD:main
+
+      - name: Report failed symbols
+        if: env.FAILED_SYMBOLS != ''
+        run: |
+          echo "::warning::Market analysis failed for:"
+          echo "${FAILED_SYMBOLS}"
