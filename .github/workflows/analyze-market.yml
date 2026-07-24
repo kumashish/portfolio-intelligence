@@ -73,4 +73,5 @@ jobs:
           fi
 
           git commit -m "chore: update market reports and README snapshot"
+          git pull --rebase origin main
           git push
