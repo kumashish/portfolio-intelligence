@@ -6,8 +6,17 @@ concurrency:
 
 on:
   schedule:
-    # 19:00 IST
-    - cron: "30 13 * * *"
+    # Every hour, Sun 8:30 PM ET through Fri 3:30 PM ET (continuous overnight
+    # coverage, no gap). Anchored to EDT (UTC-4), the currently-active US
+    # Eastern offset — this needs to be shifted to UTC-5 manually when the
+    # US switches to EST (~early Nov) and back to UTC-4 in March.
+    #
+    # Converting ET->UTC and accounting for the weekday rollover collapses
+    # to just two ranges:
+    #   - every hour Mon-Thu UTC (covers Sun 8:30PM ET onward, continuously)
+    #   - hours 00:30-19:30 UTC on Fri (covers up to Fri 3:30 PM ET)
+    - cron: "30 * * * 1-4"
+    - cron: "30 0-19 * * 5"
   workflow_dispatch:
 
 permissions:
@@ -29,42 +38,27 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
-      - name: Generate market reports
+      - name: Analyze market
         run: |
-          mkdir -p reports/market
+          for SYMBOL in SPY QQQ; do
+            echo "Analyzing ${SYMBOL}"
+            uv run pie analyze-market "$SYMBOL"
+          done
 
-          uv run pie analyze-market SPY > reports/market/SPY.txt
-          uv run pie analyze-market QQQ > reports/market/QQQ.txt
+      - name: Update README snapshot
+        run: uv run pie readme update-readme-snapshot
 
-      - name: Debug generated files
-        run: |
-          echo "Generated files:"
-          find reports -type f -print
-
-          echo
-          echo "Contents:"
-          ls -R reports
-
-      - name: Verify reports exist
-        run: |
-          test -f reports/market/SPY.txt
-          test -f reports/market/QQQ.txt
-
-      - name: Commit market reports
+      - name: Commit and push market reports
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add reports/market/
+          git add reports/market/ state/ README.md
 
           if git diff --cached --quiet; then
             echo "No report changes."
             exit 0
           fi
 
-      - name: Append to signal history
-        run: |
-          uv run python scripts/append_history.py "${SYMBOL}" "${TREND}" "${STRATEGY}" "${SIGNAL}"
-
-          git commit -m "chore: store US market reports"
+          git commit -m "chore: store US market reports and README snapshot"
           git push
