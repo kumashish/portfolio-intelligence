@@ -110,17 +110,16 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          # Now stage updated reports and README. Quote any paths with spaces.
+          
           git add reports/market state README.md
           
           if git diff --cached --quiet; then
-            echo "No report changes."
-            exit 0
+              echo "No report changes."
+              exit 0
           fi
           
-          git commit -m "chore: update market reports and README snapshot"
-          git push
+          git commit -m "chore: update market reports and README snapshot"        
+          git push origin HEAD:main || echo "Push failed (likely due to a concurrent update). Changes will be regenerated on the next scheduled run."
 
       - name: Report failed symbols
         if: env.FAILED_SYMBOLS != ''
