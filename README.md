@@ -7,6 +7,8 @@
 | QQQ       | 21:35 UTC | 🔴 Bear    | Put Debit Spread  | NEW    | Today  |
 <!-- MARKET-SNAPSHOT-END -->
 
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![Python](https://img.shields.io/badge/python-3.10-blue)
 # Portfolio Intelligence
 
 A personal market and options decision engine for systematic premium selling, directional overlays, and adaptive learning.
