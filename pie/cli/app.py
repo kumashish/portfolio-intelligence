@@ -30,6 +30,7 @@ app.add_typer(readme_app, name="readme")
 console = Console()
 
 MARKET_NAMES = {"^NSEI": "NIFTY 50", "^NSEBANK": "BANKNIFTY", "SPY": "SPY", "QQQ": "QQQ"}
+OPTION_SYMBOL_NAMES = {"^NSEI": "NIFTY", "^NSEBANK": "BANKNIFTY", "SPY": "SPY", "QQQ": "QQQ"}
 REGIME_LABELS = {
     "strong_bull": "🟢 Strong Bull",
     "bull": "🟢 Bull",
@@ -41,6 +42,29 @@ REGIME_LABELS = {
 
 VIX_SYMBOLS = {"^NSEI": "^INDIAVIX", "SPY": "^VIX", "QQQ": "^VIX"}
 FALLBACK_VIX = {"^NSEI": 15.0, "SPY": 20.0, "QQQ": 20.0}
+
+
+def _format_strike(strike: float) -> str:
+    return str(int(strike)) if strike == int(strike) else str(strike)
+
+
+def format_trade_legs(symbol: str, estimated_trade: EstimatedTrade | None) -> str:
+    """Render an estimated trade as option-symbol-style leg lines.
+
+    e.g. "Buy NIFTY 28-Jul-2026-23600-PE<br>Sell NIFTY 28-Jul-2026-23000-PE"
+    (<br> forces a line break inside a markdown table cell.)
+    """
+    if estimated_trade is None:
+        return "No Trade"
+    display_symbol = OPTION_SYMBOL_NAMES.get(symbol, symbol)
+    expiry = estimated_trade.expiration.strftime("%d-%b-%Y")
+    right_suffix = {"put": "PE", "call": "CE"}
+    lines = [
+        f"{leg.action.title()} {display_symbol} {expiry}-{_format_strike(leg.strike)}-"
+        f"{right_suffix[leg.right.value]}"
+        for leg in estimated_trade.legs
+    ]
+    return "<br>".join(lines)
 
 
 @app.command("analyze-market")
@@ -105,7 +129,7 @@ def analyze_market(
             "market": MARKET_NAMES.get(symbol, symbol),
             "last_updated": generated_at.isoformat(),
             "trend": REGIME_LABELS.get(trend.regime.value, trend.regime.value),
-            "strategy": recommendation.strategy.replace("_", " ").title(),
+            "strategy": format_trade_legs(symbol, estimated_trade),
             "signal": signal_label,
             "signal_since": state.trend_started_at.isoformat(),
         },
