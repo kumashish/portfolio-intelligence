@@ -124,10 +124,6 @@ jobs:
           fi
           
           git commit -m "chore: update market reports and README snapshot"
-          
-          git pull --rebase origin main
-          
-          git push origin HEAD:main
 
       - name: Report failed symbols
         if: env.FAILED_SYMBOLS != ''
