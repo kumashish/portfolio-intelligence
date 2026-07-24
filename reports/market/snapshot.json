@@ -2,16 +2,16 @@
   {
     "symbol": "^NSEI",
     "market": "NIFTY 50",
-    "last_updated": "2026-07-24T05:57:46.955601+00:00",
+    "last_updated": "2026-07-24T06:25:38.155236+00:00",
     "trend": "\ud83d\udd34 Bear",
-    "strategy": "Put Debit Spread",
-    "signal": "NEW",
+    "strategy": "Buy NIFTY 25-Aug-2026-23700-PE<br>Sell NIFTY 25-Aug-2026-22950-PE",
+    "signal": "Active",
     "signal_since": "2026-07-24T05:57:46.955683+00:00"
   },
   {
     "symbol": "^NSEBANK",
     "market": "BANKNIFTY",
-    "last_updated": "2026-07-24T05:57:47.599961+00:00",
+    "last_updated": "2026-07-24T06:25:38.902703+00:00",
     "trend": "\ud83d\udfe1 Neutral",
     "strategy": "No Trade",
     "signal": "Hold",

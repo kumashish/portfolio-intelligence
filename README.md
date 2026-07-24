@@ -1,8 +1,8 @@
 <!-- MARKET-SNAPSHOT-START -->
 | Market    | Updated   | Trend      | Strategy          | Signal | Since          |
 | --------- | --------- | ---------- | ----------------- | ------ | -------------- |
-| NIFTY 50  | 11:27 IST | 🔴 Bear     | Put Debit Spread  | NEW    | Today, 11:27   |
-| BANKNIFTY | 11:27 IST | 🟡 Neutral  | No Trade          | Hold   | Today, 11:27   |
+| NIFTY 50  | 11:55 IST | 🔴 Bear     | Buy NIFTY 25-Aug-2026-23700-PE<br>Sell NIFTY 25-Aug-2026-22950-PE | Active | Today, 11:27   |
+| BANKNIFTY | 11:55 IST | 🟡 Neutral  | No Trade          | Hold   | Today, 11:27   |
 <!-- MARKET-SNAPSHOT-END -->
 
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
