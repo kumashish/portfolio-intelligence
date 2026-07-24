@@ -124,7 +124,12 @@ def _last_tuesday(year: int, month: int) -> date:
 
 
 def _strike_increment(symbol: str) -> float:
-    return 50.0 if symbol == "^NSEI" else 1.0
+    if symbol == "^NSEI":
+        return 50.0
+    elif symbol == "^NSEBANK":
+        return 100.0
+    else:
+        return 1.0
 
 
 def _round_to_increment(value: float, increment: float) -> float:
